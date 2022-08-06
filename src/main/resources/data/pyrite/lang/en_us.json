@@ -1,3 +1,6 @@
 {
+	"game.scorebox": "Scorebox",
+
+	"error.pyrite.map.generator.load_template": "Could not generate map template: %s",
 	"error.pyrite.region.random_point_unsupported": "Cannot generate a random point in a region of type '%s'"
 }

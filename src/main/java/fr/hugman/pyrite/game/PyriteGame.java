@@ -1,50 +1,24 @@
 package fr.hugman.pyrite.game;
 
 import fr.hugman.pyrite.map.PyriteMap;
-import fr.hugman.pyrite.map.kit.Kit;
-import fr.hugman.pyrite.map.predicate.PyritePredicate;
-import fr.hugman.pyrite.map.region.Region;
-import fr.hugman.pyrite.map.spawn.Spawn;
-import net.minecraft.server.network.ServerPlayerEntity;
-import org.jetbrains.annotations.Nullable;
-import xyz.nucleoid.plasmid.game.common.team.GameTeam;
-import xyz.nucleoid.plasmid.game.common.team.GameTeamKey;
-import xyz.nucleoid.plasmid.util.PlayerRef;
+import net.minecraft.server.world.ServerWorld;
+import xyz.nucleoid.plasmid.game.GameActivity;
 
-import java.util.Objects;
+public final class PyriteGame {
+	private final PyriteMap map;
+	private final ServerWorld world;
+	private PlayerManager playerManager;
 
-public record PyriteGame(PyriteMap map, PlayerManager playerManager) {
-	public GameTeam team(GameTeamKey key) {
-		return this.map.teams().byKey(key);
+	public PyriteGame(PyriteMap map, ServerWorld world) {
+		this.map = map;
+		this.world = world;
 	}
 
-	@Nullable
-	public GameTeamKey teamKey(PlayerRef player) {
-		return this.playerManager.teamManager().teamFor(player);
+	public void createPlayerManager(GameActivity activity) {
+		this.playerManager = PlayerManager.create(activity);
 	}
 
-	@Nullable
-	public GameTeamKey teamKey(ServerPlayerEntity player) {
-		return this.playerManager.teamManager().teamFor(player);
-	}
-
-	public boolean isSpectator(ServerPlayerEntity player) {
-		return this.playerManager.isSpectator(player);
-	}
-
-	public Region region(String key) {
-		return Objects.requireNonNull(this.map.regions().byKey(key));
-	}
-
-	public Spawn spawn(String key) {
-		return Objects.requireNonNull(this.map.spawns().byKey(key));
-	}
-
-	public PyritePredicate predicate(String key) {
-		return Objects.requireNonNull(this.map.predicates().byKey(key));
-	}
-
-	public Kit kit(String key) {
-		return Objects.requireNonNull(this.map.kits().byKey(key));
-	}
+	public PyriteMap map() {return map;}
+	public ServerWorld world() {return world;}
+	public PlayerManager playerManager() {return playerManager;}
 }

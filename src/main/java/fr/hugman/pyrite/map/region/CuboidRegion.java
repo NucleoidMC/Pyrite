@@ -2,7 +2,7 @@ package fr.hugman.pyrite.map.region;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fr.hugman.pyrite.map.PyriteMap;
+import fr.hugman.pyrite.game.PyriteGame;
 import fr.hugman.pyrite.util.PyriteCodecs;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
@@ -31,7 +31,7 @@ public record CuboidRegion(Vec3d min, Vec3d max) implements Region {
 	}
 
 	@Override
-	public Vec3d getRandomPoint(PyriteMap map, Random random) {
+	public Vec3d getRandomPoint(PyriteGame game, Random random) {
 		double x = this.randomRange(random, this.min.getX(), this.max.getX());
 		double y = this.randomRange(random, this.min.getY(), this.max.getY());
 		double z = this.randomRange(random, this.min.getZ(), this.max.getZ());
@@ -43,7 +43,7 @@ public record CuboidRegion(Vec3d min, Vec3d max) implements Region {
 	}
 
 	@Override
-	public boolean contains(PyriteMap map, Vec3d pos) {
+	public boolean contains(PyriteGame game, Vec3d pos) {
 		return pos.getX() >= this.min.getX()
 				&& pos.getY() >= this.min.getY()
 				&& pos.getZ() >= this.min.getZ()
@@ -53,7 +53,7 @@ public record CuboidRegion(Vec3d min, Vec3d max) implements Region {
 	}
 
 	@Override
-	public boolean isInfinite(PyriteMap map) {
+	public boolean isInfinite(PyriteGame game) {
 		return false;
 	}
 }

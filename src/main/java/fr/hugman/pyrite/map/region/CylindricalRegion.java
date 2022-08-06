@@ -2,7 +2,7 @@ package fr.hugman.pyrite.map.region;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fr.hugman.pyrite.map.PyriteMap;
+import fr.hugman.pyrite.game.PyriteGame;
 import fr.hugman.pyrite.util.PyriteCodecs;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
@@ -20,7 +20,7 @@ public record CylindricalRegion(Vec3d base, double radius, double top) implement
 	}
 
 	@Override
-	public Vec3d getRandomPoint(PyriteMap map, Random random) {
+	public Vec3d getRandomPoint(PyriteGame game, Random random) {
 		double angle = random.nextDouble() * Math.PI * 2;
 		double hyp = random.nextDouble() + random.nextDouble();
 		hyp = (hyp < 1 ? hyp : 2 - hyp) * radius;
@@ -31,7 +31,7 @@ public record CylindricalRegion(Vec3d base, double radius, double top) implement
 	}
 
 	@Override
-	public boolean contains(PyriteMap map, Vec3d pos) {
+	public boolean contains(PyriteGame game, Vec3d pos) {
 		if(pos.getY() < base.getY()) return false; // point is below
 		if(pos.getY() > base.getY() + top) return false; // point is above
 
@@ -41,7 +41,7 @@ public record CylindricalRegion(Vec3d base, double radius, double top) implement
 	}
 
 	@Override
-	public boolean isInfinite(PyriteMap map) {
+	public boolean isInfinite(PyriteGame game) {
 		return false;
 	}
 }

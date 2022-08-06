@@ -2,7 +2,7 @@ package fr.hugman.pyrite.map.region;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fr.hugman.pyrite.map.PyriteMap;
+import fr.hugman.pyrite.game.PyriteGame;
 import fr.hugman.pyrite.util.PyriteCodecs;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
@@ -19,17 +19,17 @@ public record BlockRegion(BlockPos pos) implements Region {
 	}
 
 	@Override
-	public Vec3d getRandomPoint(PyriteMap map, Random random) {
+	public Vec3d getRandomPoint(PyriteGame game, Random random) {
 		return Vec3d.of(this.pos.add(random.nextDouble(), random.nextDouble(), random.nextDouble()));
 	}
 
 	@Override
-	public boolean contains(PyriteMap map, Vec3d pos) {
+	public boolean contains(PyriteGame game, Vec3d pos) {
 		return new BlockPos(pos).equals(this.pos);
 	}
 
 	@Override
-	public boolean isInfinite(PyriteMap map) {
+	public boolean isInfinite(PyriteGame game) {
 		return false;
 	}
 }

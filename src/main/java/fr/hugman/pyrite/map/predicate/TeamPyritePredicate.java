@@ -13,13 +13,13 @@ public record TeamPyritePredicate(GameTeamKey teamKey) implements PyritePredicat
 
 	@Override
 	public PyritePredicateType<?> getType() {
-		return PyritePredicateType.ALWAYS;
+		return PyritePredicateType.TEAM;
 	}
 
 	@Override
 	public boolean test(PyriteEventContext context) {
 		if(context.thisEntity() instanceof ServerPlayerEntity player) {
-			GameTeamKey key = context.game().teamKey(player);
+			GameTeamKey key = context.game().playerManager().teamKey(player);
 			if(key == null) return false;
 			return key.id().equals(teamKey.id());
 		}

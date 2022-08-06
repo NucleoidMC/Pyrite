@@ -13,7 +13,7 @@ public interface PyritePredicate extends Predicate<PyriteEventContext> {
 
 	Codec<PyritePredicate> CODEC = PREDICATE_CODEC.xmap(
 			either -> either.map(ReferencePyritePredicate::new, Function.identity()),
-			provider -> provider instanceof ReferencePyritePredicate reference ? Either.left(reference.key()) : Either.right(provider)
+			provider -> provider instanceof ReferencePyritePredicate reference ? Either.left(reference.predicateKey()) : Either.right(provider)
 	);
 
 	PyritePredicateType<?> getType();

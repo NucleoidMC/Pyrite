@@ -4,7 +4,7 @@ import com.mojang.serialization.Codec;
 import fr.hugman.pyrite.PyriteRegistries;
 
 public interface PyriteTrigger {
-	Codec<PyriteTrigger> CODEC = PyriteRegistries.TRIGGER_EVENT_TYPE.getCodec().dispatch(PyriteTrigger::getType, PyriteTriggerType::codec);
+	Codec<PyriteTrigger> CODEC = PyriteRegistries.TRIGGER_TYPE.getCodec().dispatch(PyriteTrigger::getType, PyriteTriggerType::codec);
 
 	PyriteTriggerType<?> getType();
 

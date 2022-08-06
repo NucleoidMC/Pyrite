@@ -9,12 +9,12 @@ public record PyriteTriggerType<P extends PyriteTrigger>(Codec<P> codec) {
 	public static final PyriteTriggerType<CancelPyriteTrigger> CANCEL = register("cancel", CancelPyriteTrigger.CODEC);
 
 	private static <P extends PyriteTrigger> PyriteTriggerType<P> register(String name, Codec<P> codec) {
-		return Registry.register(PyriteRegistries.TRIGGER_EVENT_TYPE, Pyrite.id(name), new PyriteTriggerType<>(codec));
+		return Registry.register(PyriteRegistries.TRIGGER_TYPE, Pyrite.id(name), new PyriteTriggerType<>(codec));
 	}
 
 	@Override
 	public String toString() {
-		var id = PyriteRegistries.TRIGGER_EVENT_TYPE.getId(this);
+		var id = PyriteRegistries.TRIGGER_TYPE.getId(this);
 		if(id == null) {
 			return "UNKNOWN";
 		}

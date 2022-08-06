@@ -6,9 +6,9 @@ import fr.hugman.pyrite.context.PyriteEventContext;
 
 import java.util.List;
 
-public record AllPyritePredicate(List<PyritePredicate> predicate) implements PyritePredicate {
+public record AllPyritePredicate(List<PyritePredicate> predicates) implements PyritePredicate {
 	public static final Codec<AllPyritePredicate> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-			PyritePredicate.CODEC.listOf().fieldOf("predicates").forGetter(AllPyritePredicate::predicate)
+			PyritePredicate.CODEC.listOf().fieldOf("predicates").forGetter(AllPyritePredicate::predicates)
 	).apply(instance, AllPyritePredicate::new));
 
 	@Override
@@ -18,7 +18,7 @@ public record AllPyritePredicate(List<PyritePredicate> predicate) implements Pyr
 
 	@Override
 	public boolean test(PyriteEventContext context) {
-		for(var predicate : predicate) {
+		for(var predicate : predicates) {
 			if(!predicate.test(context)) {
 				return false;
 			}

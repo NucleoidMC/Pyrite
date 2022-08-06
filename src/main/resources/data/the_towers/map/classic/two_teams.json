@@ -5,11 +5,20 @@
   "created": "02/04/2013",
   "authors": [
     {
-      "uuid": "f48faa1f-aab2-44d5-94d2-8b0404f3a227"
+      "uuid": "f48faa1f-aab2-44d5-94d2-8b0404f3a227",
+      "name": "Quijx"
     }
   ],
-  "daylight_cycle": false,
-  "dimension": "minecraft:overworld",
+  "generator": {
+    "template": "the_towers:classic/two_teams",
+    "daylight_cycle": false,
+    "dimension": "minecraft:overworld"
+  },
+  "player_config": {
+    "min": 1,
+    "threshold": 8,
+    "max": 16
+  },
   "teams": [
     {
       "key": "blue",
@@ -132,15 +141,30 @@
   ],
   "kits": {
     "spawn_kit": {
-      "content": {
-        "0": "minecraft:diamond_sword"
+      "slots": {
+        "0": {
+          "id": "minecraft:diamond_sword",
+          "Count": 1
+        }
       }
     },
     "blue_spawn_kit": {
-      "parent": "spawn_kit"
+      "parent": "spawn_kit",
+      "slots": {
+        "1": {
+          "id": "minecraft:diamond_pickaxe",
+          "Count": 1
+        }
+      }
     },
     "red_spawn_kit": {
-      "parent": "spawn_kit"
+      "parent": "spawn_kit",
+      "slots": {
+        "1": {
+          "id": "minecraft:diamond_axe",
+          "Count": 1
+        }
+      }
     }
   },
   "score": {

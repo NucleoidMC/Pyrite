@@ -1,0 +1,152 @@
+{
+  "name": "The Towers (Two Teams) - Classic 2013",
+  "version": "1.0.0",
+  "description": "Get to the enemy's pool 10 times!",
+  "created": "02/04/2013",
+  "authors": [
+    {
+      "uuid": "f48faa1f-aab2-44d5-94d2-8b0404f3a227"
+    }
+  ],
+  "daylight_cycle": false,
+  "dimension": "minecraft:overworld",
+  "teams": [
+    {
+      "key": "blue",
+      "name": {
+        "translate": "color.minecraft.blue"
+      },
+      "color": "blue"
+    },
+    {
+      "key": "red",
+      "name": {
+        "translate": "color.minecraft.red"
+      },
+      "color": "red"
+    }
+  ],
+  "regions": {
+    "blue_spawn": {
+      "type": "pyrite:cuboid",
+      "a": "-86,42,-2",
+      "b": "-82,42,2"
+    },
+    "blue_pool": {
+      "type": "pyrite:cuboid",
+      "a": "-85,50,-1",
+      "b": "-83,50,1"
+    },
+    "red_spawn": {
+      "type": "pyrite:cuboid",
+      "a": "82,50,-2",
+      "b": "86,42,2"
+    },
+    "red_pool": {
+      "type": "pyrite:cuboid",
+      "a": "83,50,-1",
+      "b": "85,50,1"
+    },
+    "protected": {
+      "type": "pyrite:union",
+      "regions": [
+        {
+          "type": "pyrite:reference",
+          "region": "blue_pool"
+        },
+        {
+          "type": "pyrite:reference",
+          "region": "red_pool"
+        }
+      ]
+    }
+  },
+  "spawns": {
+    "default": {
+      "point": "0,28,-82"
+    },
+    "blue": {
+      "point": "-82,42,2",
+      "kit": "blue_kit"
+    },
+    "red": {
+      "point": "-82,42,2",
+      "angle": {
+        "yaw": -90
+      },
+      "kit": "red_kit"
+    }
+  },
+  "predicates": {
+    "is_blue": {
+      "type": "pyrite:team",
+      "team": "blue"
+    },
+    "is_red": {
+      "type": "pyrite:team",
+      "team": "red"
+    }
+  },
+  "listeners": [
+    {
+      "region": "blue_spawn",
+      "enter": {
+        "predicate": "is_red",
+        "trigger": {
+          "type": "pyrite:cancel"
+        },
+        "message": "You cannot enter the enemy's spawn!"
+      }
+    },
+    {
+      "region": "red_spawn",
+      "enter": {
+        "predicate": "is_blue",
+        "trigger": {
+          "type": "pyrite:cancel"
+        },
+        "message": "You cannot enter the enemy's spawn!"
+      }
+    },
+    {
+      "region": "protected",
+      "place": {
+        "trigger": {
+          "type": "pyrite:cancel"
+        },
+        "message": "You cannot place blocks here!"
+      },
+      "break": {
+        "trigger": {
+          "type": "pyrite:cancel"
+        },
+        "message": "You cannot break blocks here!"
+      },
+      "use": {
+        "trigger": {
+          "type": "pyrite:cancel"
+        },
+        "message": "You cannot use blocks here!"
+      }
+    }
+  ],
+  "kits": {
+    "spawn_kit": {
+      "content": {
+        "0": "minecraft:diamond_sword"
+      }
+    },
+    "blue_spawn_kit": {
+      "parent": "spawn_kit"
+    },
+    "red_spawn_kit": {
+      "parent": "spawn_kit"
+    }
+  },
+  "score": {
+    "limit": 10
+  },
+  "respawn": {
+    "delay": 100
+  }
+}

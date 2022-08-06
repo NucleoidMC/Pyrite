@@ -1,0 +1,9 @@
+{
+  "type": "pyrite:base",
+  "name": {
+    "translate": "game.scorebox"
+  },
+  "maps": [
+    "the_towers:classic/two_teams"
+  ]
+}

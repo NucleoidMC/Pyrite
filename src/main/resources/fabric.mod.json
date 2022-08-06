@@ -1,0 +1,27 @@
+{
+	"schemaVersion": 1,
+	"id": "pyrite",
+	"version": "${version}",
+	"name": "Pyrite",
+	"description": "The ultimate API for creating PvP minigames for Fabric.",
+	"authors": [
+		"Hugman"
+	],
+	"license": "MIT",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"fr.hugman.pyrite.Pyrite"
+		]
+	},
+	"mixins": [
+		"pyrite.mixins.json"
+	],
+	"depends": {
+		"java": ">=16",
+		"minecraft": "1.19.x",
+		"fabricloader": ">=0.9.1",
+		"fabric": "*",
+		"plasmid": "0.5.x"
+	}
+}

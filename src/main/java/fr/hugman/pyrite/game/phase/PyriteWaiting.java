@@ -4,19 +4,17 @@ import com.mojang.serialization.JsonOps;
 import fr.hugman.pyrite.PyriteConfig;
 import fr.hugman.pyrite.game.PyriteGame;
 import fr.hugman.pyrite.map.PyriteMap;
+import fr.hugman.pyrite.map.spawn.Spawn;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ChunkTicketType;
-import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.GameMode;
 import xyz.nucleoid.fantasy.RuntimeWorldConfig;
-import xyz.nucleoid.plasmid.game.GameActivity;
 import xyz.nucleoid.plasmid.game.GameOpenContext;
 import xyz.nucleoid.plasmid.game.GameOpenProcedure;
 import xyz.nucleoid.plasmid.game.GameResult;
@@ -73,25 +71,28 @@ public record PyriteWaiting(PyriteGame game, GameSpace gameSpace, TeamSelectionL
 
 	private ActionResult killPlayer(ServerPlayerEntity player, DamageSource source) {
 		player.setHealth(20.0f);
-		this.tpPlayer(player);
+		this.tpToSpawn(player);
 		return ActionResult.FAIL;
 	}
 
-	private void tpPlayer(ServerPlayerEntity player) {
-		BlockPos pos = new BlockPos(getSpawnPos());
+	private void tpToSpawn(ServerPlayerEntity player) {
+		var spawn = getSpawn();
+		var random = this.game.world().getRandom();
+		BlockPos pos = new BlockPos(spawn.point().getRandom(this.game, random));
 		ChunkPos chunkPos = new ChunkPos(pos.getX() >> 4, pos.getZ() >> 4);
 		this.game.world().getChunkManager().addTicket(ChunkTicketType.POST_TELEPORT, chunkPos, 1, player.getId());
-		player.teleport(this.game.world(), pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, 0.0F, 0.0F);
+		player.teleport(this.game.world(), pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, spawn.angle().yaw().get(random), spawn.angle().pitch().get(random));
 	}
 
-	private Vec3d getSpawnPos() {
-		return this.game.map().getDefaultSpawn().point().getRandom(this.game, this.game.world().getRandom());
+	private Spawn getSpawn() {
+		return this.game.map().getDefaultSpawn();
 	}
 
 	private PlayerOfferResult offerPlayer(PlayerOffer offer) {
-		return offer.accept(this.game.world(), this.getSpawnPos()).and(() -> {
+		return offer.accept(this.game.world(), this.getSpawn().point().getRandom(this.game, this.game.world().getRandom())).and(() -> {
 			ServerPlayerEntity player = offer.player();
 			player.changeGameMode(GameMode.ADVENTURE);
+			this.tpToSpawn(player);
 		});
 	}
 }

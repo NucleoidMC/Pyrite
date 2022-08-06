@@ -37,12 +37,12 @@ public record PyriteMap(
 			PyriteMapGenerator.CODEC.fieldOf("generator").forGetter(PyriteMap::generator),
 			PlayerConfig.CODEC.fieldOf("player_config").forGetter(PyriteMap::playerConfig),
 			GameTeamList.CODEC.fieldOf("teams").forGetter(PyriteMap::teams),
-			KeyableList.codec(Region.CODEC).fieldOf("regions").forGetter(PyriteMap::regions),
-			KeyableList.codec(Spawn.CODEC).fieldOf("spawns").forGetter(PyriteMap::spawns),
-			KeyableList.codec(PyritePredicate.CODEC).fieldOf("predicates").forGetter(PyriteMap::predicates),
-			RegionListeners.LIST_CODEC.fieldOf("listeners").forGetter(PyriteMap::listeners),
-			KeyableList.codec(Kit.CODEC).fieldOf("kits").forGetter(PyriteMap::kits),
-			RespawnSettings.CODEC.fieldOf("respawn").forGetter(PyriteMap::respawnSettings)
+			KeyableList.codec(Region.CODEC).fieldOf("regions").orElse(KeyableList.empty()).forGetter(PyriteMap::regions),
+			KeyableList.codec(Spawn.CODEC).fieldOf("spawns").orElse(KeyableList.empty()).forGetter(PyriteMap::spawns),
+			KeyableList.codec(PyritePredicate.CODEC).fieldOf("predicates").orElse(KeyableList.empty()).forGetter(PyriteMap::predicates),
+			RegionListeners.LIST_CODEC.fieldOf("listeners").orElse(List.of()).forGetter(PyriteMap::listeners),
+			KeyableList.codec(Kit.CODEC).fieldOf("kits").orElse(KeyableList.empty()).forGetter(PyriteMap::kits),
+			RespawnSettings.CODEC.fieldOf("respawn").orElse(RespawnSettings.DEFAULT).forGetter(PyriteMap::respawnSettings)
 	).apply(instance, PyriteMap::new));
 
 	public static PyriteMap fromConfig(PyriteConfig config, DynamicRegistryManager registryManager) {

@@ -18,6 +18,10 @@ public record KeyableList<K, V>(Map<K, V> map) implements Iterable<V> {
 		return KeyableList.codec(Codec.STRING, valueCodec);
 	}
 
+	public static <K, V> KeyableList<K, V> empty() {
+		return new KeyableList<>(Map.of());
+	}
+
 	@NotNull
 	@Override
 	public Iterator<V> iterator() {

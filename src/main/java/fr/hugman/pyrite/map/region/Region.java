@@ -1,5 +1,6 @@
 package fr.hugman.pyrite.map.region;
 
+import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import fr.hugman.pyrite.PyriteRegistries;
 import fr.hugman.pyrite.game.PyriteGame;
@@ -7,8 +8,15 @@ import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.math.random.Random;
 
+import java.util.function.Function;
+
 public interface Region {
-	Codec<Region> CODEC = PyriteRegistries.REGION_TYPE.getCodec().dispatch(Region::getType, RegionType::codec);
+	Codec<Either<String, Region>> REGION_CODEC = Codec.either(Codec.STRING, PyriteRegistries.REGION_TYPE.getCodec().dispatch(Region::getType, RegionType::codec));
+
+	Codec<Region> CODEC = REGION_CODEC.xmap(
+			either -> either.map(ReferenceRegion::new, Function.identity()),
+			provider -> provider instanceof ReferenceRegion reference ? Either.left(reference.regionKey()) : Either.right(provider)
+	);
 
 	RegionType<?> getType();
 

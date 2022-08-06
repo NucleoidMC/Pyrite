@@ -59,14 +59,8 @@
     "protected": {
       "type": "pyrite:union",
       "regions": [
-        {
-          "type": "pyrite:reference",
-          "region": "blue_pool"
-        },
-        {
-          "type": "pyrite:reference",
-          "region": "red_pool"
-        }
+        "blue_pool",
+        "red_pool"
       ]
     }
   },

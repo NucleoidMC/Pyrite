@@ -1,5 +1,6 @@
 package fr.hugman.pyrite;
 
+import com.google.common.reflect.Reflection;
 import fr.hugman.pyrite.map.PyriteMap;
 import fr.hugman.pyrite.map.point.PointProviderType;
 import fr.hugman.pyrite.map.predicate.PyritePredicateType;
@@ -14,4 +15,12 @@ public class PyriteRegistries {
 	public static final SimpleRegistry<RegionType> REGION_TYPE = FabricRegistryBuilder.createSimple(RegionType.class, Pyrite.id("region_type")).buildAndRegister();
 	public static final SimpleRegistry<PyriteTriggerType> TRIGGER_TYPE = FabricRegistryBuilder.createSimple(PyriteTriggerType.class, Pyrite.id("trigger_type")).buildAndRegister();
 	public static final SimpleRegistry<PyriteMap> MAP = FabricRegistryBuilder.createSimple(PyriteMap.class, Pyrite.id("map")).buildAndRegister();
+
+	public static void onInitialize() {
+		Reflection.initialize(PointProviderType.class);
+		Reflection.initialize(PyritePredicateType.class);
+		Reflection.initialize(RegionType.class);
+		Reflection.initialize(PyriteTriggerType.class);
+		Reflection.initialize(PyriteMap.class);
+	}
 }

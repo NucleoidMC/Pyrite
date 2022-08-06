@@ -16,5 +16,7 @@ public interface PyritePredicate extends Predicate<PyriteEventContext> {
 			provider -> provider instanceof ReferencePyritePredicate reference ? Either.left(reference.predicateKey()) : Either.right(provider)
 	);
 
+	PyritePredicate DEFAULT = AlwaysPyritePredicate.INSTANCE;
+
 	PyritePredicateType<?> getType();
 }

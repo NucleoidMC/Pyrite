@@ -13,7 +13,7 @@ import java.util.function.Predicate;
 
 public record PyriteListener(PyritePredicate predicate, PyriteTrigger trigger, Optional<Text> message) implements Predicate<PyriteEventContext> {
 	public static final Codec<PyriteListener> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-			PyritePredicate.CODEC.fieldOf("predicate").forGetter(PyriteListener::predicate),
+			PyritePredicate.CODEC.fieldOf("predicate").orElse(PyritePredicate.DEFAULT).forGetter(PyriteListener::predicate),
 			PyriteTrigger.CODEC.fieldOf("trigger").forGetter(PyriteListener::trigger),
 			PlasmidCodecs.TEXT.optionalFieldOf("message").forGetter(PyriteListener::message)
 	).apply(instance, PyriteListener::new));

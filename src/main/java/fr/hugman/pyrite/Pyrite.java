@@ -1,9 +1,6 @@
 package fr.hugman.pyrite;
 
-import com.google.common.reflect.Reflection;
 import fr.hugman.pyrite.game.phase.PyriteWaiting;
-import fr.hugman.pyrite.map.predicate.PyritePredicateType;
-import fr.hugman.pyrite.map.region.RegionType;
 import net.fabricmc.api.ModInitializer;
 import net.minecraft.util.Identifier;
 import org.apache.logging.log4j.LogManager;
@@ -20,9 +17,7 @@ public class Pyrite implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		Reflection.initialize(PyriteRegistries.class);
-		Reflection.initialize(PyritePredicateType.class);
-		Reflection.initialize(RegionType.class);
+		PyriteRegistries.onInitialize();
 		GameType.register(Pyrite.id("base"), PyriteConfig.CODEC, PyriteWaiting::open);
 	}
 }

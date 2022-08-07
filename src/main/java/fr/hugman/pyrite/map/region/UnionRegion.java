@@ -11,7 +11,7 @@ import java.util.List;
 
 public record UnionRegion(List<Region> regions) implements Region {
 	public static final Codec<UnionRegion> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-		MoreCodecs.listOrUnit(Region.CODEC).fieldOf("regions").forGetter(UnionRegion::regions)
+			MoreCodecs.listOrUnit(Region.CODEC).fieldOf("regions").forGetter(UnionRegion::regions)
 	).apply(instance, UnionRegion::new));
 
 	@Override

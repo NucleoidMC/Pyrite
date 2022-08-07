@@ -90,7 +90,7 @@
       "team": "red"
     }
   },
-  "listeners": [
+  "listener_configs": [
     {
       "region": "blue_spawn",
       "enter": {

@@ -13,6 +13,7 @@ public record PyritePredicateType<P extends PyritePredicate>(Codec<P> codec) {
 	public static final PyritePredicateType<AnyPyritePredicate> ANY = register("any", AnyPyritePredicate.CODEC);
 	public static final PyritePredicateType<AllPyritePredicate> ALL = register("all", AllPyritePredicate.CODEC);
 	public static final PyritePredicateType<TeamPyritePredicate> TEAM = register("team", TeamPyritePredicate.CODEC);
+	public static final PyritePredicateType<RegionPyritePredicate> REGION = register("region", RegionPyritePredicate.CODEC);
 
 	private static <P extends PyritePredicate> PyritePredicateType<P> register(String name, Codec<P> codec) {
 		return Registry.register(PyriteRegistries.PYRITE_PREDICATE_TYPE, Pyrite.id(name), new PyritePredicateType<>(codec));

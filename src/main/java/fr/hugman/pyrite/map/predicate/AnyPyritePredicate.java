@@ -2,7 +2,7 @@ package fr.hugman.pyrite.map.predicate;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fr.hugman.pyrite.context.PyriteEventContext;
+import fr.hugman.pyrite.context.EventContext;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ public record AnyPyritePredicate(List<PyritePredicate> predicate) implements Pyr
 	}
 
 	@Override
-	public boolean test(PyriteEventContext context) {
+	public boolean test(EventContext context) {
 		return predicate.stream().anyMatch(p -> p.test(context));
 	}
 }

@@ -1,7 +1,7 @@
 package fr.hugman.pyrite.map.predicate;
 
 import com.mojang.serialization.Codec;
-import fr.hugman.pyrite.context.PyriteEventContext;
+import fr.hugman.pyrite.context.EventContext;
 
 public record NeverPyritePredicate() implements PyritePredicate {
 	public static final NeverPyritePredicate INSTANCE = new NeverPyritePredicate();
@@ -14,7 +14,7 @@ public record NeverPyritePredicate() implements PyritePredicate {
 	}
 
 	@Override
-	public boolean test(PyriteEventContext context) {
+	public boolean test(EventContext context) {
 		return false;
 	}
 }

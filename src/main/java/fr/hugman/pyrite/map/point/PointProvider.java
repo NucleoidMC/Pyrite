@@ -3,10 +3,11 @@ package fr.hugman.pyrite.map.point;
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
 import fr.hugman.pyrite.PyriteRegistries;
-import fr.hugman.pyrite.game.PyriteGame;
+import fr.hugman.pyrite.context.EventContext;
 import fr.hugman.pyrite.util.PyriteCodecs;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.random.Random;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.function.Function;
@@ -20,7 +21,15 @@ public interface PointProvider {
 
 	PointProviderType<?> getType();
 
-	Vec3d getRandom(PyriteGame game, Random random);
+	Vec3d getRandom(Random random, @Nullable EventContext context);
 
-	Iterator<Vec3d> iterator(PyriteGame game);
+	default Vec3d getRandom(Random random) {
+		return getRandom(random, null);
+	}
+
+	Iterator<Vec3d> iterator(@Nullable EventContext context);
+
+	default Iterator<Vec3d> iterator() {
+		return iterator(null);
+	}
 }

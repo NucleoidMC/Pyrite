@@ -62,7 +62,8 @@ public record PyriteActive(PyriteGame game) {
 
 	private ActionResult killPlayer(ServerPlayerEntity player, DamageSource source) {
 		//TODO: custom death (switch to FAIL!!!!! and make player respawn correctly)
-		return ActionResult.SUCCESS;
+		this.game.respawn(player);
+		return ActionResult.FAIL;
 	}
 
 	private ActionResult dropItem(ServerPlayerEntity player, int i, ItemStack stack) {
@@ -86,7 +87,7 @@ public record PyriteActive(PyriteGame game) {
 				}
 			}
 		}
-		return ActionResult.CONSUME;
+		return ActionResult.SUCCESS;
 	}
 
 	private ActionResult breakBlock(ServerPlayerEntity player, ServerWorld world, BlockPos pos) {
@@ -105,7 +106,7 @@ public record PyriteActive(PyriteGame game) {
 				}
 			}
 		}
-		return ActionResult.CONSUME;
+		return ActionResult.SUCCESS;
 	}
 
 	private ActionResult useBlock(ServerPlayerEntity player, Hand hand, BlockHitResult hitResult) {
@@ -124,7 +125,7 @@ public record PyriteActive(PyriteGame game) {
 				}
 			}
 		}
-		return ActionResult.CONSUME;
+		return ActionResult.SUCCESS;
 	}
 
 	private void enable() {
@@ -141,34 +142,36 @@ public record PyriteActive(PyriteGame game) {
 			var playerData = this.game.playerManager().playerData(player);
 			var lastPos = playerData.lastTickPos;
 			var currentPos = player.getPos();
-			for(var listenerConfig : this.game.map().listenerConfigs()) {
-				var region = this.game.map().region(listenerConfig.regionKey());
-				if(region != null) {
-					if(region.enters(this.game, lastPos, currentPos)) {
-						var enter = listenerConfig.enter();
-						if(enter.isPresent()) {
-							var result = enter.get().test(EventContext.create(this.game).entity(player).build());
-							if(result != ActionResult.PASS) {
-								if(result == ActionResult.FAIL) {
-									player.teleport(this.game.world(), lastPos.getX(), lastPos.getY(), lastPos.getZ(), player.getYaw(), player.getPitch());
+			if(!lastPos.equals(currentPos)) {
+				for(var listenerConfig : this.game.map().listenerConfigs()) {
+					var region = this.game.map().region(listenerConfig.regionKey());
+					if(region != null) {
+						if(region.enters(this.game, lastPos, currentPos)) {
+							var enter = listenerConfig.enter();
+							if(enter.isPresent()) {
+								var result = enter.get().test(EventContext.create(this.game).entity(player).build());
+								if(result != ActionResult.PASS) {
+									if(result == ActionResult.FAIL) {
+										player.teleport(this.game.world(), lastPos.getX(), lastPos.getY(), lastPos.getZ(), player.getYaw(), player.getPitch());
+									}
 								}
 							}
 						}
-					}
-					if(region.exits(this.game, lastPos, currentPos)) {
-						var exit = listenerConfig.exit();
-						if(exit.isPresent()) {
-							var result = exit.get().test(EventContext.create(this.game).entity(player).build());
-							if(result != ActionResult.PASS) {
-								if(result == ActionResult.FAIL) {
-									player.teleport(this.game.world(), lastPos.getX(), lastPos.getY(), lastPos.getZ(), player.getYaw(), player.getPitch());
+						if(region.exits(this.game, lastPos, currentPos)) {
+							var exit = listenerConfig.exit();
+							if(exit.isPresent()) {
+								var result = exit.get().test(EventContext.create(this.game).entity(player).build());
+								if(result != ActionResult.PASS) {
+									if(result == ActionResult.FAIL) {
+										player.teleport(this.game.world(), lastPos.getX(), lastPos.getY(), lastPos.getZ(), player.getYaw(), player.getPitch());
+									}
 								}
 							}
 						}
 					}
 				}
+				playerData.lastTickPos = currentPos;
 			}
-			playerData.lastTickPos = currentPos;
 		}
 		//TODO: check win conditions
 	}

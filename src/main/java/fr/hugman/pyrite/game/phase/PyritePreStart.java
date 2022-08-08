@@ -68,11 +68,6 @@ public record PyritePreStart(PyriteGame game, TeamSelectionLobby teamSelection) 
 	}
 
 	private GameResult requestStart() {
-		if(Pyrite.WIP) {
-			var result = PyriteMap.CODEC.encodeStart(JsonOps.INSTANCE, this.game.map());
-			this.game.sendMessage(Text.literal(result.get().left().get().toString()));
-			return GameResult.error(Text.literal("This game has yet to be implemented. Come around later!"));
-		}
 		return PyriteActive.transferActivity(this);
 	}
 

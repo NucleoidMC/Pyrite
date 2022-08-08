@@ -11,8 +11,6 @@ public class Pyrite implements ModInitializer {
 	private static final String MOD_ID = "pyrite";
 	public static final Logger LOGGER = LogManager.getLogger(MOD_ID);
 
-	public static final boolean WIP = true;
-
 	public static Identifier id(String s) {
 		return new Identifier(MOD_ID, s);
 	}

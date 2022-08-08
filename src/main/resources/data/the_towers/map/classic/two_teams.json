@@ -38,8 +38,8 @@
   "regions": {
     "blue_spawn": {
       "type": "pyrite:cuboid",
-      "a": "-86,42,-2",
-      "b": "-82,42,2"
+      "a": "-87,41,-3",
+      "b": "-81,44,3"
     },
     "blue_pool": {
       "type": "pyrite:cuboid",
@@ -48,8 +48,8 @@
     },
     "red_spawn": {
       "type": "pyrite:cuboid",
-      "a": "82,50,-2",
-      "b": "86,42,2"
+      "a": "87,41,-3",
+      "b": "81,44,3"
     },
     "red_pool": {
       "type": "pyrite:cuboid",
@@ -59,7 +59,9 @@
     "protected": {
       "type": "pyrite:union",
       "regions": [
+        "blue_spawn",
         "blue_pool",
+        "red_spawn",
         "red_pool"
       ]
     }
@@ -69,13 +71,16 @@
       "point": "0,28,-82"
     },
     "blue": {
-      "point": "-82,42,2",
+      "point": "-84,41.5,0",
+      "angle": {
+        "yaw": -90
+      },
       "kit": "blue_kit"
     },
     "red": {
-      "point": "-82,42,2",
+      "point": "84,41.5,0",
       "angle": {
-        "yaw": -90
+        "yaw": 90
       },
       "kit": "red_kit"
     }
@@ -83,11 +88,13 @@
   "predicates": {
     "is_blue": {
       "type": "pyrite:team",
-      "team": "blue"
+      "team": "blue",
+      "entity": "this_entity"
     },
     "is_red": {
       "type": "pyrite:team",
-      "team": "red"
+      "team": "red",
+      "entity": "this_entity"
     }
   },
   "listener_configs": [

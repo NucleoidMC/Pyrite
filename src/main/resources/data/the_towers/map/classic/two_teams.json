@@ -49,7 +49,7 @@
     "blue_pool": {
       "type": "pyrite:cuboid",
       "a": "-85,50,-1",
-      "b": "-83,50,1"
+      "b": "-83,51,1"
     },
     "red_base": {
       "type": "pyrite:cuboid",
@@ -64,7 +64,7 @@
     "red_pool": {
       "type": "pyrite:cuboid",
       "a": "83,50,-1",
-      "b": "85,50,1"
+      "b": "85,51,1"
     }
   },
   "spawns": {
@@ -85,6 +85,9 @@
       },
       "kit": "red_kit"
     }
+  },
+  "respawn": {
+    "delay": 100
   },
   "predicates": {
     "blue": {
@@ -132,29 +135,73 @@
           ]
         }
       ]
+    },
+    "score_red": {
+      "type": "pyrite:all",
+      "predicates": [
+        {
+          "type": "pyrite:not",
+          "predicate": "red"
+        },
+        {
+          "type": "pyrite:region",
+          "region": "red_pool"
+        }
+      ]
+    },
+    "score_blue": {
+      "type": "pyrite:all",
+      "predicates": [
+        {
+          "type": "pyrite:not",
+          "predicate": "blue"
+        },
+        {
+          "type": "pyrite:region",
+          "region": "blue_pool"
+        }
+      ]
     }
   },
   "player_listeners": {
-    "move": {
-      "predicate": "enemy_spawn",
-      "trigger": {
-        "type": "pyrite:cancel"
+    "move": [
+      {
+        "predicate": "enemy_spawn",
+        "trigger": {
+          "type": "pyrite:cancel",
+          "message": "You cannot enter an enemy spawn!"
+        }
       },
-      "message": "You cannot enter an enemy spawn!"
-    },
+      {
+        "predicate": "score_red",
+        "trigger": {
+          "type": "pyrite:point",
+          "team": "red",
+          "amount": -1
+        }
+      },
+      {
+        "predicate": "score_blue",
+        "trigger": {
+          "type": "pyrite:point",
+          "team": "blue",
+          "amount": -1
+        }
+      }
+    ],
     "place_block": {
       "predicate": "spawn",
       "trigger": {
-        "type": "pyrite:cancel"
-      },
-      "message": "You cannot place blocks in a spawn!"
+        "type": "pyrite:cancel",
+        "message": "You cannot place blocks in a spawn!"
+      }
     },
     "break_block": {
       "predicate": "spawn",
       "trigger": {
-        "type": "pyrite:cancel"
-      },
-      "message": "You cannot break blocks in a spawn!"
+        "type": "pyrite:cancel",
+        "message": "You cannot break blocks in a spawn!"
+      }
     }
   },
   "kits": {
@@ -185,10 +232,10 @@
       }
     }
   },
-  "score": {
-    "limit": 10
-  },
-  "respawn": {
-    "delay": 100
+  "objectives": {
+    "score": {
+      "base": 10,
+      "min": 0
+    }
   }
 }

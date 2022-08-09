@@ -3,7 +3,7 @@ package fr.hugman.pyrite.game;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.util.math.Vec3d;
 
-public final class PlayerData {
+public class PlayerData {
 	public Vec3d lastTickPos;
 
 	public static PlayerData create(ServerPlayerEntity player) {

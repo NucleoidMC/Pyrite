@@ -3,6 +3,9 @@ package fr.hugman.pyrite.game.phase;
 import fr.hugman.pyrite.context.EventContext;
 import fr.hugman.pyrite.game.PlayerManager;
 import fr.hugman.pyrite.game.PyriteGame;
+import fr.hugman.pyrite.game.PyriteSidebar;
+import fr.hugman.pyrite.map.objective.ScoreObjective;
+import fr.hugman.pyrite.map.objective.progress.ScoreProgress;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemStack;
@@ -14,6 +17,7 @@ import net.minecraft.util.Hand;
 import net.minecraft.util.hit.BlockHitResult;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.GameMode;
+import xyz.nucleoid.plasmid.game.GameCloseReason;
 import xyz.nucleoid.plasmid.game.GameResult;
 import xyz.nucleoid.plasmid.game.common.GlobalWidgets;
 import xyz.nucleoid.plasmid.game.common.team.TeamManager;
@@ -28,14 +32,28 @@ import xyz.nucleoid.stimuli.event.block.BlockUseEvent;
 import xyz.nucleoid.stimuli.event.item.ItemThrowEvent;
 import xyz.nucleoid.stimuli.event.player.PlayerDeathEvent;
 
-public record PyriteActive(PyriteGame game) {
+import java.util.Optional;
+
+public final class PyriteActive {
+	private final PyriteGame game;
+	private final PyriteSidebar sidebar;
+	public long gameTick = 0;
+	public long gameCloseTick = -1L;
+
+	public PyriteActive(PyriteGame game, PyriteSidebar sidebar) {
+		this.game = game;
+		this.sidebar = sidebar;
+	}
+
 	public static GameResult transferActivity(PyritePreStart preStart) {
 		preStart.game().space().setActivity(activity -> {
-			var widgets = GlobalWidgets.addTo(activity);
-			// TODO: sidebar
-			preStart.game().setPlayerManager(PlayerManager.create(preStart.game(), TeamManager.addTo(activity), preStart.teamSelection()));
+			var playerManager = PlayerManager.create(preStart.game(), TeamManager.addTo(activity), preStart.teamSelection());
+			preStart.game().setPlayerManager(playerManager);
 
-			var active = new PyriteActive(preStart.game());
+			var widgets = GlobalWidgets.addTo(activity);
+			var sidebar = PyriteSidebar.create(preStart.game(), widgets);
+
+			var active = new PyriteActive(preStart.game(), sidebar);
 
 			activity.allow(GameRuleType.CRAFTING);
 			activity.deny(GameRuleType.PORTALS);
@@ -59,6 +77,15 @@ public record PyriteActive(PyriteGame game) {
 			activity.listen(BlockUseEvent.EVENT, active::useBlock);
 		});
 		return GameResult.ok();
+	}
+
+	private PlayerOfferResult offerPlayer(PlayerOffer offer) {
+		//TODO : team re-joining
+		var player = offer.player();
+		return offer.accept(this.game.world(), this.game.getSpawn(player).pos(this.game, player)).and(() -> {
+			player.changeGameMode(GameMode.ADVENTURE);
+			this.game.tpToSpawn(player);
+		});
 	}
 
 	private ActionResult killPlayer(ServerPlayerEntity player, DamageSource source) {
@@ -108,13 +135,14 @@ public record PyriteActive(PyriteGame game) {
 
 	private void enable() {
 		//TODO: print map info (objectives mainly)
-		//TODO: spawn players
 		for(var player : this.game.onlinePlayers()) {
 			this.game.respawn(player);
 		}
+		this.game.playerManager().progressManager().scoreProgress().ifPresent(scoreObjective -> this.game.playerManager().teamKeys().forEach(scoreObjective::points));
 	}
 
 	private void tick() {
+		this.gameTick++;
 		// Check if players are entering or exiting regions
 		for(var player : this.game.onlinePlayers()) {
 			var playerData = this.game.playerManager().playerData(player);
@@ -134,14 +162,11 @@ public record PyriteActive(PyriteGame game) {
 			}
 		}
 		//TODO: check win conditions
+		if(this.gameTick % 20 == 0) this.sidebar.update(this.gameTick);
+		if(this.gameTick == this.gameCloseTick) this.game.space().close(GameCloseReason.FINISHED);
 	}
 
-	private PlayerOfferResult offerPlayer(PlayerOffer offer) {
-		//TODO : team re-joining
-		var player = offer.player();
-		return offer.accept(this.game.world(), this.game.getSpawn(player).pos(this.game, player)).and(() -> {
-			player.changeGameMode(GameMode.ADVENTURE);
-			this.game.tpToSpawn(player);
-		});
+	private void checkWin() {
+		Optional<ScoreProgress> optScore = this.game.playerManager().progressManager().scoreProgress();
 	}
 }

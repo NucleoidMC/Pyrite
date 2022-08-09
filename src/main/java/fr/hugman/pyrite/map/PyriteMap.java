@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.hugman.pyrite.PyriteConfig;
 import fr.hugman.pyrite.map.kit.Kit;
 import fr.hugman.pyrite.map.listener.PlayerListenerLists;
+import fr.hugman.pyrite.map.objective.ObjectivesConfig;
 import fr.hugman.pyrite.map.predicate.PyritePredicate;
 import fr.hugman.pyrite.map.region.Region;
 import fr.hugman.pyrite.map.spawn.RespawnSettings;
@@ -27,11 +28,12 @@ import xyz.nucleoid.plasmid.game.common.team.GameTeamList;
  * @param playerConfig        the player configuration
  * @param teams               the list of teams
  * @param regions             the keyed list of all regions (empty by default)
+ * @param respawnSettings     the respawn settings - optional
  * @param spawns              the keyed list of all spawns (requires a region with ID 'default')
  * @param predicates          the keyed list of all predicates (empty by default)
  * @param playerListenerLists the list of all listenerConfigs (empty by default)
  * @param kits                the keyed list of all kits (empty by default)
- * @param respawnSettings     the respawn settings - optional
+ * @param objectives          the configuration for the objectives (requires at least one of the sub-configurations)
  *
  * @author Hugman
  * @see PyriteConfig#maps() location of the map within the Pyrite configuration
@@ -44,10 +46,11 @@ public record PyriteMap(
 		GameTeamList teams,
 		KeyableList<String, Region> regions,
 		KeyableList<String, Spawn> spawns,
+		RespawnSettings respawnSettings,
 		KeyableList<String, PyritePredicate> predicates,
 		PlayerListenerLists playerListenerLists,
 		KeyableList<String, Kit> kits,
-		RespawnSettings respawnSettings
+		ObjectivesConfig objectives
 ) {
 	public static final Codec<PyriteMap> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			PyriteMapMetadata.MAP_CODEC.forGetter(PyriteMap::metadata),
@@ -56,10 +59,11 @@ public record PyriteMap(
 			GameTeamList.CODEC.fieldOf("teams").forGetter(PyriteMap::teams),
 			KeyableList.codec(Region.CODEC).fieldOf("regions").orElse(KeyableList.empty()).forGetter(PyriteMap::regions),
 			KeyableList.codec(Spawn.CODEC).fieldOf("spawns").orElse(KeyableList.empty()).forGetter(PyriteMap::spawns),
+			RespawnSettings.CODEC.fieldOf("respawn").orElse(RespawnSettings.DEFAULT).forGetter(PyriteMap::respawnSettings),
 			KeyableList.codec(PyritePredicate.CODEC).fieldOf("predicates").orElse(KeyableList.empty()).forGetter(PyriteMap::predicates),
 			PlayerListenerLists.CODEC.fieldOf("player_listeners").forGetter(PyriteMap::playerListenerLists),
 			KeyableList.codec(Kit.CODEC).fieldOf("kits").orElse(KeyableList.empty()).forGetter(PyriteMap::kits),
-			RespawnSettings.CODEC.fieldOf("respawn").orElse(RespawnSettings.DEFAULT).forGetter(PyriteMap::respawnSettings)
+			ObjectivesConfig.CODEC.fieldOf("objectives").forGetter(PyriteMap::objectives)
 	).apply(instance, PyriteMap::new));
 
 	public GameTeam team(GameTeamKey key) {

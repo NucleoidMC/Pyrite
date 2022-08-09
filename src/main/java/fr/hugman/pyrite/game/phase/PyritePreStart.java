@@ -25,7 +25,6 @@ import xyz.nucleoid.stimuli.event.player.PlayerDamageEvent;
 import xyz.nucleoid.stimuli.event.player.PlayerDeathEvent;
 
 public record PyritePreStart(PyriteGame game, TeamSelectionLobby teamSelection) {
-
 	public static GameOpenProcedure open(GameOpenContext<PyriteConfig> context) {
 		PyriteConfig config = context.config();
 		MinecraftServer server = context.server();

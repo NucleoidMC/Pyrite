@@ -2,6 +2,7 @@ package fr.hugman.pyrite.game;
 
 import fr.hugman.pyrite.game.phase.PyriteActive;
 import fr.hugman.pyrite.map.PyriteMap;
+import fr.hugman.pyrite.map.objective.progress.ProgressManager;
 import fr.hugman.pyrite.map.spawn.Spawn;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ChunkTicketType;
@@ -10,7 +11,6 @@ import net.minecraft.text.Text;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.GameMode;
-import org.jetbrains.annotations.Nullable;
 import xyz.nucleoid.plasmid.game.GameSpace;
 import xyz.nucleoid.plasmid.game.GameSpacePlayers;
 
@@ -19,6 +19,7 @@ public final class PyriteGame {
 	private final GameSpace space;
 	private final ServerWorld world;
 	private PlayerManager playerManager;
+	private ProgressManager progressManager;
 
 	public PyriteGame(PyriteMap map, GameSpace space, ServerWorld world) {
 		this.map = map;
@@ -37,7 +38,6 @@ public final class PyriteGame {
 	 *
 	 * @see PyriteActive#transferActivity
 	 */
-	@Nullable
 	public PlayerManager playerManager() {return playerManager;}
 
 	public void setPlayerManager(PlayerManager playerManager) {this.playerManager = playerManager;}

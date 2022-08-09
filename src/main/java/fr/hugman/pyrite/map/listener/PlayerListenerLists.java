@@ -14,6 +14,7 @@ public record PlayerListenerLists(
 		List<Listener> breakBlock,
 		List<Listener> useBlock
 ) {
+	//TODO: add death listener
 	public static final Codec<PlayerListenerLists> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			MoreCodecs.listOrUnit(Listener.CODEC).fieldOf("move").orElse(List.of()).forGetter(PlayerListenerLists::move),
 			MoreCodecs.listOrUnit(Listener.CODEC).fieldOf("enter_region").orElse(List.of()).forGetter(PlayerListenerLists::enterRegion),

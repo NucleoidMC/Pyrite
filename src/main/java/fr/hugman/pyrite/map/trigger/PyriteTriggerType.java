@@ -7,6 +7,7 @@ import net.minecraft.util.registry.Registry;
 
 public record PyriteTriggerType<P extends PyriteTrigger>(Codec<P> codec) {
 	public static final PyriteTriggerType<CancelPyriteTrigger> CANCEL = register("cancel", CancelPyriteTrigger.CODEC);
+	public static final PyriteTriggerType<PointPyriteTrigger> POINT = register("point", PointPyriteTrigger.CODEC);
 
 	private static <P extends PyriteTrigger> PyriteTriggerType<P> register(String name, Codec<P> codec) {
 		return Registry.register(PyriteRegistries.TRIGGER_TYPE, Pyrite.id(name), new PyriteTriggerType<>(codec));

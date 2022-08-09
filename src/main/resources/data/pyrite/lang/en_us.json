@@ -1,6 +1,10 @@
 {
 	"game.scorebox": "Scorebox",
 
+	"commands.pyrite.map.invalid": "There is no map with id \"%s\"",
+	"commands.pyrite.map.info.failed.decode": "Failed to decode map info",
+	"commands.pyrite.map.info.failed.display": "Failed to display map info",
+
 	"error.pyrite.map.generator.load_template": "Could not generate map template: %s",
 	"error.pyrite.region.random_point_unsupported": "Cannot generate a random point in a region of type '%s'"
 }

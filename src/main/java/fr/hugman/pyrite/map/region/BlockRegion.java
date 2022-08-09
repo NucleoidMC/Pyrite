@@ -10,7 +10,7 @@ import net.minecraft.util.math.random.Random;
 
 public record BlockRegion(BlockPos pos) implements Region {
 	public static final Codec<BlockRegion> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-			PyriteCodecs.BLOCK_POS.fieldOf("blockPos").forGetter(BlockRegion::pos)
+			PyriteCodecs.BLOCK_POS.fieldOf("pos").forGetter(BlockRegion::pos)
 	).apply(instance, BlockRegion::new));
 
 	@Override

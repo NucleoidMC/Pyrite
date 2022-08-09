@@ -6,7 +6,7 @@ import fr.hugman.pyrite.context.EventContext;
 
 public record ReferencePyritePredicate(String predicateKey) implements PyritePredicate {
 	public static final Codec<ReferencePyritePredicate> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-			Codec.STRING.fieldOf("predicates").forGetter(ReferencePyritePredicate::predicateKey)
+			Codec.STRING.fieldOf("predicate").forGetter(ReferencePyritePredicate::predicateKey)
 	).apply(instance, ReferencePyritePredicate::new));
 
 	@Override

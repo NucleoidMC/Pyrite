@@ -54,6 +54,7 @@ public record PyriteActive(PyriteGame game) {
 			activity.listen(PlayerDeathEvent.EVENT, active::killPlayer);
 			activity.listen(ItemThrowEvent.EVENT, active::dropItem);
 			activity.listen(BlockPlaceEvent.BEFORE, active::placeBlock);
+			activity.listen(BlockPlaceEvent.AFTER, active::placedBlock);
 			activity.listen(BlockBreakEvent.EVENT, active::breakBlock);
 			activity.listen(BlockUseEvent.EVENT, active::useBlock);
 		});
@@ -68,64 +69,41 @@ public record PyriteActive(PyriteGame game) {
 
 	private ActionResult dropItem(ServerPlayerEntity player, int i, ItemStack stack) {
 		//TODO: expand region listener configs and context for players dropping items
-		return ActionResult.SUCCESS;
+		return ActionResult.PASS;
 	}
 
 	private ActionResult placeBlock(ServerPlayerEntity player, ServerWorld world, BlockPos pos, BlockState state, ItemUsageContext context) {
-		//TODO: this should instead look for the listeners that
-		// return FAIL/CONSUME/CONSUME_PARTIAL/SUCCESS (in priority order)
-		// FIRST and then triggers these ones (if there are any)
-		for(var listenerConfig : this.game.map().listenerConfigs()) {
-			var region = this.game.map().region(listenerConfig.regionKey());
-			if(region != null && region.contains(this.game, pos)) {
-				var place = listenerConfig.place();
-				if(place.isPresent()) {
-					var result = place.get().test(EventContext.create(this.game).entity(player).build());
-					if(result != ActionResult.PASS) {
-						return result;
-					}
-				}
-			}
+		for(var listenerConfig : this.game.map().playerListenerLists().placeBlock()) {
+			var result = listenerConfig.test(EventContext.create(this.game).entity(player).blockPos(pos).build());
+			if(result == ActionResult.PASS) continue;
+			return result;
 		}
-		return ActionResult.SUCCESS;
+		return ActionResult.PASS;
+	}
+
+	private void placedBlock(ServerPlayerEntity player, ServerWorld world, BlockPos pos, BlockState blockState) {
+		for(var listenerConfig : this.game.map().playerListenerLists().placeBlock()) {
+			var result = listenerConfig.test(EventContext.create(this.game).entity(player).blockPos(pos).build());
+			if(result == ActionResult.FAIL) world.breakBlock(pos, true);
+		}
 	}
 
 	private ActionResult breakBlock(ServerPlayerEntity player, ServerWorld world, BlockPos pos) {
-		//TODO: this should instead look for the listeners that
-		// return FAIL/CONSUME/CONSUME_PARTIAL/SUCCESS (in priority order)
-		// FIRST and then triggers these ones (if there are any)
-		for(var listenerConfig : this.game.map().listenerConfigs()) {
-			var region = this.game.map().region(listenerConfig.regionKey());
-			if(region != null && region.contains(this.game, pos)) {
-				var brek = listenerConfig.brek();
-				if(brek.isPresent()) {
-					var result = brek.get().test(EventContext.create(this.game).entity(player).build());
-					if(result != ActionResult.PASS) {
-						return result;
-					}
-				}
-			}
+		for(var listenerConfig : this.game.map().playerListenerLists().breakBlock()) {
+			var result = listenerConfig.test(EventContext.create(this.game).entity(player).blockPos(pos).build());
+			if(result == ActionResult.PASS) continue;
+			return result;
 		}
-		return ActionResult.SUCCESS;
+		return ActionResult.PASS;
 	}
 
 	private ActionResult useBlock(ServerPlayerEntity player, Hand hand, BlockHitResult hitResult) {
-		//TODO: this should instead look for the listeners that
-		// return FAIL/CONSUME/CONSUME_PARTIAL/SUCCESS (in priority order)
-		// FIRST and then triggers these ones (if there are any)
-		for(var listenerConfig : this.game.map().listenerConfigs()) {
-			var region = this.game.map().region(listenerConfig.regionKey());
-			if(region != null && region.contains(this.game, hitResult.getBlockPos())) {
-				var use = listenerConfig.use();
-				if(use.isPresent()) {
-					var result = use.get().test(EventContext.create(this.game).entity(player).build());
-					if(result != ActionResult.PASS) {
-						return result;
-					}
-				}
-			}
+		for(var listenerConfig : this.game.map().playerListenerLists().useBlock()) {
+			var result = listenerConfig.test(EventContext.create(this.game).entity(player).blockPos(hitResult.getBlockPos()).build());
+			if(result == ActionResult.PASS) continue;
+			return result;
 		}
-		return ActionResult.SUCCESS;
+		return ActionResult.PASS;
 	}
 
 	private void enable() {
@@ -143,40 +121,23 @@ public record PyriteActive(PyriteGame game) {
 			var lastPos = playerData.lastTickPos;
 			var currentPos = player.getPos();
 			if(!lastPos.equals(currentPos)) {
-				for(var listenerConfig : this.game.map().listenerConfigs()) {
-					var region = this.game.map().region(listenerConfig.regionKey());
-					if(region != null) {
-						if(region.enters(this.game, lastPos, currentPos)) {
-							var enter = listenerConfig.enter();
-							if(enter.isPresent()) {
-								var result = enter.get().test(EventContext.create(this.game).entity(player).build());
-								if(result != ActionResult.PASS) {
-									if(result == ActionResult.FAIL) {
-										player.teleport(this.game.world(), lastPos.getX(), lastPos.getY(), lastPos.getZ(), player.getYaw(), player.getPitch());
-									}
-								}
-							}
-						}
-						if(region.exits(this.game, lastPos, currentPos)) {
-							var exit = listenerConfig.exit();
-							if(exit.isPresent()) {
-								var result = exit.get().test(EventContext.create(this.game).entity(player).build());
-								if(result != ActionResult.PASS) {
-									if(result == ActionResult.FAIL) {
-										player.teleport(this.game.world(), lastPos.getX(), lastPos.getY(), lastPos.getZ(), player.getYaw(), player.getPitch());
-									}
-								}
-							}
-						}
+				boolean cannotMove = false;
+				for(var listenerConfig : this.game.map().playerListenerLists().move()) {
+					var result = listenerConfig.test(EventContext.create(this.game).entity(player).build());
+					if(result == ActionResult.FAIL) {
+						cannotMove = true;
 					}
 				}
-				playerData.lastTickPos = currentPos;
+				//TODO: implement entering/leaving regions
+				if(cannotMove) player.teleport(this.game.world(), lastPos.getX(), lastPos.getY(), lastPos.getZ(), player.getYaw(), player.getPitch());
+				else playerData.lastTickPos = currentPos;
 			}
 		}
 		//TODO: check win conditions
 	}
 
 	private PlayerOfferResult offerPlayer(PlayerOffer offer) {
+		//TODO : team re-joining
 		var player = offer.player();
 		return offer.accept(this.game.world(), this.game.getSpawn(player).pos(this.game, player)).and(() -> {
 			player.changeGameMode(GameMode.ADVENTURE);

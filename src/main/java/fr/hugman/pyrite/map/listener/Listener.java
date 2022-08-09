@@ -11,17 +11,19 @@ import xyz.nucleoid.plasmid.util.PlasmidCodecs;
 
 import java.util.Optional;
 
-public record PyriteListener(PyritePredicate predicate, PyriteTrigger trigger, Optional<Text> message) {
-	public static final Codec<PyriteListener> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-			PyritePredicate.CODEC.fieldOf("predicate").orElse(PyritePredicate.DEFAULT).forGetter(PyriteListener::predicate),
-			PyriteTrigger.CODEC.fieldOf("trigger").forGetter(PyriteListener::trigger),
-			PlasmidCodecs.TEXT.optionalFieldOf("message").forGetter(PyriteListener::message)
-	).apply(instance, PyriteListener::new));
+public record Listener(PyritePredicate predicate, PyriteTrigger trigger, Optional<Text> message) {
+	public static final Codec<Listener> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+			PyritePredicate.CODEC.fieldOf("predicate").orElse(PyritePredicate.DEFAULT).forGetter(Listener::predicate),
+			PyriteTrigger.CODEC.fieldOf("trigger").forGetter(Listener::trigger),
+			PlasmidCodecs.TEXT.optionalFieldOf("message").forGetter(Listener::message)
+	).apply(instance, Listener::new));
 
 	public ActionResult test(EventContext context) {
 		if(!this.predicate.test(context)) return ActionResult.PASS;
 
-		this.message.ifPresent(m -> context.thisEntity().sendMessage(m));
+		this.message.ifPresent(m -> {
+			if(context.thisEntity() != null) context.thisEntity().sendMessage(m);
+		});
 		return trigger.cancelsContext() ? ActionResult.FAIL : ActionResult.SUCCESS;
 	}
 }

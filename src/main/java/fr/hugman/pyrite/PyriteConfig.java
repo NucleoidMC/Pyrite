@@ -11,7 +11,12 @@ import java.util.List;
 
 /**
  * Main configuration of a game mode.
- * @param maps
+ *
+ * @param maps the list of maps that can be loaded
+ *
+ * @author Hugman
+ * @see PyriteMap the main map configuration
+ * @since 1.0.0
  */
 public record PyriteConfig(List<Identifier> maps) {
 	public static final Codec<PyriteConfig> CODEC = RecordCodecBuilder.create(instance -> instance.group(

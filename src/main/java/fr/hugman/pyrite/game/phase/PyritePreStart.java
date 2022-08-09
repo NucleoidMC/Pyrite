@@ -1,19 +1,12 @@
 package fr.hugman.pyrite.game.phase;
 
-import com.mojang.serialization.JsonOps;
-import fr.hugman.pyrite.Pyrite;
 import fr.hugman.pyrite.PyriteConfig;
 import fr.hugman.pyrite.game.PyriteGame;
 import fr.hugman.pyrite.map.PyriteMap;
-import fr.hugman.pyrite.map.spawn.Spawn;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.network.ServerPlayerEntity;
-import net.minecraft.server.world.ChunkTicketType;
-import net.minecraft.text.Text;
 import net.minecraft.util.ActionResult;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.GameMode;
 import xyz.nucleoid.fantasy.RuntimeWorldConfig;

@@ -2,7 +2,6 @@ package fr.hugman.pyrite.map;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import fr.hugman.pyrite.PyriteConfig;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.text.Text;
 import net.minecraft.util.Identifier;
@@ -20,9 +19,9 @@ import java.io.IOException;
  * <p>
  * This class currently only supports {@link TemplateChunkGenerator} and its corresponding settings.
  *
- * @param templateId the template ID
+ * @param templateId    the template ID
  * @param daylightCycle
- * @param dimensions
+ * @param dimension
  *
  * @author Hugman
  * @see PyriteMap#generator() location of the generator within the map
@@ -31,15 +30,16 @@ import java.io.IOException;
 public record PyriteMapGenerator(
 		Identifier templateId,
 		boolean daylightCycle,
-		RegistryEntry<DimensionType> dimensions
+		RegistryEntry<DimensionType> dimension
 ) {
 	public static final Codec<PyriteMapGenerator> CODEC = RecordCodecBuilder.create(instance -> instance.group(
 			Identifier.CODEC.fieldOf("template").forGetter(PyriteMapGenerator::templateId),
 			Codec.BOOL.fieldOf("daylight_cycle").forGetter(PyriteMapGenerator::daylightCycle),
-			DimensionType.REGISTRY_CODEC.fieldOf("dimension").forGetter(PyriteMapGenerator::dimensions)
+			DimensionType.REGISTRY_CODEC.fieldOf("dimension").forGetter(PyriteMapGenerator::dimension)
 	).apply(instance, PyriteMapGenerator::new));
 
 	//TODO: implement map generator types (i.e. for procedural generation)
+	//TODO: use dimension and daylight cycle
 
 	public ChunkGenerator getChunkGenerator(MinecraftServer server) {
 		try {

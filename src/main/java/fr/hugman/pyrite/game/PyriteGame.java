@@ -8,14 +8,11 @@ import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.server.world.ServerWorld;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.ChunkPos;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.math.random.Random;
+import net.minecraft.world.GameMode;
 import org.jetbrains.annotations.Nullable;
-import xyz.nucleoid.plasmid.game.GameOpenException;
 import xyz.nucleoid.plasmid.game.GameSpace;
 import xyz.nucleoid.plasmid.game.GameSpacePlayers;
-import xyz.nucleoid.plasmid.util.PlayerRef;
 
 public final class PyriteGame {
 	private final PyriteMap map;
@@ -52,8 +49,10 @@ public final class PyriteGame {
 	public void sendMessage(Text message) {this.onlinePlayers().sendMessage(message);}
 
 	public void respawn(ServerPlayerEntity player) {
-		//TODO: give kit
+		player.changeGameMode(GameMode.SURVIVAL);
+		this.resetPlayer(player);
 		this.tpToSpawn(player);
+		//TODO: give kit
 	}
 
 	public void tpToSpawn(ServerPlayerEntity player) {
@@ -67,13 +66,23 @@ public final class PyriteGame {
 		player.teleport(this.world, pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5, spawn.yaw(random), spawn.pitch(random));
 	}
 
+	public void resetPlayer(ServerPlayerEntity player) {
+		player.extinguish();
+		player.fallDistance = 0.0F;
+		player.getInventory().clear();
+		player.getEnderChestInventory().clear();
+		player.clearStatusEffects();
+		player.getHungerManager().setFoodLevel(20);
+		player.setExperienceLevel(0);
+		player.setExperiencePoints(0);
+		player.setHealth(player.getMaxHealth());
+	}
+
 	public Spawn getSpawn(ServerPlayerEntity player) {
 		if(playerManager != null) {
 			var teamKey = playerManager.teamKey(player);
 			if(teamKey != null) {
-				var spawn = this.map.spawn(teamKey.id());
-				if(spawn == null) throw new GameOpenException(Text.literal("Missing spawn for team " + teamKey.id()));
-				return spawn;
+				return this.map.spawn(teamKey.id());
 			}
 		}
 		return this.map.getDefaultSpawn();

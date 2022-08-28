@@ -6,8 +6,11 @@ import fr.hugman.pyrite.map.objective.ScoreObjective;
 import net.minecraft.text.Text;
 import xyz.nucleoid.plasmid.game.common.team.GameTeamKey;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ScoreProgress {
 	private final ScoreObjective objective;
@@ -22,7 +25,15 @@ public class ScoreProgress {
 	}
 
 	public void addPoint(GameTeamKey key, int amount) {
-		this.points.put(key, amount);
+		this.points.compute(key, (teamKey, current) -> current + amount);
+	}
+
+	public boolean isWinning(GameTeamKey teamKey) {
+		return this.points.get(teamKey) >= this.objective.max().orElse(this.objective.base());
+	}
+
+	public boolean shouldBeEliminated(GameTeamKey teamKey) {
+		return this.points.get(teamKey) <= this.objective.max().map(integer -> 0).orElse(1);
 	}
 
 	public GameTeamKey getTeamKey(int i) {
@@ -31,17 +42,17 @@ public class ScoreProgress {
 
 	public GameTeamKey getTeamKey(int i, GameTeamKey except) {
 		boolean includesExcept = false;
-		for(int j = 0; j < this.points.size(); j++) {
+		for(int j = 0; j <= i; j++) {
 			GameTeamKey key = this.getTeamKey(j);
 			if(key == except) {
 				includesExcept = true;
 			}
 		}
-		return this.points.keySet().stream().filter(teamKey -> teamKey != except).toList().get(includesExcept ? i + 1 : i);
+		return getTeamKey(includesExcept ? i + 1 : i);
 	}
 
 	public Text getTeamText(PyriteGame game, GameTeamKey key) {
-		return Text.literal(game.map().team(key).config().name() + " - " + points.get(key));
+		return Text.literal(game.map().team(key).config().name().getString() + ": " + points.get(key));
 	}
 
 	public void fillSidebar(PyriteGame game, LineBuilder builder) {
@@ -56,7 +67,7 @@ public class ScoreProgress {
 
 		// then display the other teams
 		if(this.points.keySet().size() > 1) {
-			for(int i = 0 ; i < this.points.keySet().size() - 2; i++) {
+			for(int i = 0 ; i < this.points.keySet().size() - 1; i++) {
 				int finalI = i;
 				builder.add(player -> {
 					var teamKey = game.playerManager().teamKey(player);

@@ -7,19 +7,24 @@ import fr.hugman.pyrite.map.spawn.Spawn;
 import net.minecraft.server.network.ServerPlayerEntity;
 import net.minecraft.server.world.ChunkTicketType;
 import net.minecraft.server.world.ServerWorld;
+import net.minecraft.sound.SoundEvent;
+import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.GameMode;
 import xyz.nucleoid.plasmid.game.GameSpace;
 import xyz.nucleoid.plasmid.game.GameSpacePlayers;
+import xyz.nucleoid.plasmid.game.common.team.GameTeamKey;
+import xyz.nucleoid.plasmid.game.player.PlayerSet;
+
+import java.util.List;
 
 public final class PyriteGame {
 	private final PyriteMap map;
 	private final GameSpace space;
 	private final ServerWorld world;
 	private PlayerManager playerManager;
-	private ProgressManager progressManager;
 
 	public PyriteGame(PyriteMap map, GameSpace space, ServerWorld world) {
 		this.map = map;
@@ -45,6 +50,39 @@ public final class PyriteGame {
 	public Random random() {return world.getRandom();}
 
 	public GameSpacePlayers onlinePlayers() {return space.getPlayers();}
+
+	public PlayerSet onlinePlayers(GameTeamKey teamKey) {
+		return this.playerManager.teamManager().playersIn(teamKey);
+	}
+
+	public void updateWinningStatus(GameTeamKey teamKey) {
+		var data = this.playerManager.teamData(teamKey);
+		boolean wasEliminated = data.eliminated;
+		if(this.playerManager.progressManager().scoreProgress().isPresent()) {
+			if(this.playerManager.progressManager().scoreProgress().get().isWinning(teamKey)) {
+				data.isWinning = true;
+			}
+			if(this.playerManager.progressManager().scoreProgress().get().shouldBeEliminated(teamKey)) {
+				data.eliminated = true;
+			}
+		}
+
+		if(data.eliminated && !wasEliminated) {
+			this.eliminate(teamKey);
+		}
+	}
+
+	public void eliminate(GameTeamKey teamKey) {
+		// TODO: put team members in spectator
+		this.onlinePlayers(teamKey).forEach(player -> player.changeGameMode(GameMode.SPECTATOR));
+
+		Text msg = Text.translatable("text.the_towers.team_eliminated", this.playerManager.teamConfig(teamKey).name());
+
+		this.sendMessage(Text.literal("\n").append(msg).append("\n"));
+		this.playSound(SoundEvents.ENTITY_FIREWORK_ROCKET_BLAST);
+	}
+
+	public void playSound(SoundEvent sound) {this.onlinePlayers().playSound(sound);}
 
 	public void sendMessage(Text message) {this.onlinePlayers().sendMessage(message);}
 

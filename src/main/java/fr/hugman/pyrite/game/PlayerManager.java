@@ -70,10 +70,6 @@ public record PlayerManager(TeamManager teamManager, ProgressManager progressMan
 		return this.playerDataMap.get(player.getUuid());
 	}
 
-	public PlayerSet onlinePlayers(GameTeamKey teamKey) {
-		return this.teamManager.playersIn(teamKey);
-	}
-
 	public boolean isSpectator(ServerPlayerEntity player) {
 		return this.teamManager.teamFor(player) == null;
 	}

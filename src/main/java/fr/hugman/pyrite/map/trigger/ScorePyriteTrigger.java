@@ -12,15 +12,15 @@ import xyz.nucleoid.plasmid.game.common.team.GameTeamKey;
 
 import java.util.Optional;
 
-public record PointPyriteTrigger(GameTeamKey teamKey, IntProvider amount) implements PyriteTrigger {
-	public static final Codec<PointPyriteTrigger> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-			GameTeamKey.CODEC.fieldOf("team").forGetter(PointPyriteTrigger::teamKey),
-			IntProvider.VALUE_CODEC.fieldOf("amount").forGetter(PointPyriteTrigger::amount)
-	).apply(instance, PointPyriteTrigger::new));
+public record ScorePyriteTrigger(GameTeamKey teamKey, IntProvider amount) implements PyriteTrigger {
+	public static final Codec<ScorePyriteTrigger> CODEC = RecordCodecBuilder.create(instance -> instance.group(
+			GameTeamKey.CODEC.fieldOf("team").forGetter(ScorePyriteTrigger::teamKey),
+			IntProvider.VALUE_CODEC.fieldOf("amount").forGetter(ScorePyriteTrigger::amount)
+	).apply(instance, ScorePyriteTrigger::new));
 
 	@Override
 	public PyriteTriggerType<?> getType() {
-		return PyriteTriggerType.POINT;
+		return PyriteTriggerType.SCORE;
 	}
 
 	@Override
@@ -44,6 +44,7 @@ public record PointPyriteTrigger(GameTeamKey teamKey, IntProvider amount) implem
 		Optional<ScoreProgress> optScore = context.game().playerManager().progressManager().scoreProgress();
 		if(optScore.isEmpty()) throw new IllegalStateException("No score objective found");
 		optScore.get().addPoint(this.teamKey, i);
-		return ActionResult.FAIL;
+		context.game().updateWinningStatus(this.teamKey);
+		return ActionResult.PASS;
 	}
 }

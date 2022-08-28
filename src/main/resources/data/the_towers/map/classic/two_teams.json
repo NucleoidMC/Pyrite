@@ -175,7 +175,7 @@
       {
         "predicate": "score_red",
         "trigger": {
-          "type": "pyrite:point",
+          "type": "pyrite:score",
           "team": "red",
           "amount": -1
         }
@@ -183,7 +183,7 @@
       {
         "predicate": "score_blue",
         "trigger": {
-          "type": "pyrite:point",
+          "type": "pyrite:score",
           "team": "blue",
           "amount": -1
         }
@@ -234,8 +234,7 @@
   },
   "objectives": {
     "score": {
-      "base": 10,
-      "min": 0
+      "base": 10
     }
   }
 }

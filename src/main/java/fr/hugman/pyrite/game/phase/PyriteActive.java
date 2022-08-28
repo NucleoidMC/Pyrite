@@ -4,8 +4,6 @@ import fr.hugman.pyrite.context.EventContext;
 import fr.hugman.pyrite.game.PlayerManager;
 import fr.hugman.pyrite.game.PyriteGame;
 import fr.hugman.pyrite.game.PyriteSidebar;
-import fr.hugman.pyrite.map.objective.ScoreObjective;
-import fr.hugman.pyrite.map.objective.progress.ScoreProgress;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemStack;
@@ -31,8 +29,6 @@ import xyz.nucleoid.stimuli.event.block.BlockPlaceEvent;
 import xyz.nucleoid.stimuli.event.block.BlockUseEvent;
 import xyz.nucleoid.stimuli.event.item.ItemThrowEvent;
 import xyz.nucleoid.stimuli.event.player.PlayerDeathEvent;
-
-import java.util.Optional;
 
 public final class PyriteActive {
 	private final PyriteGame game;
@@ -166,7 +162,8 @@ public final class PyriteActive {
 		if(this.gameTick == this.gameCloseTick) this.game.space().close(GameCloseReason.FINISHED);
 	}
 
-	private void checkWin() {
-		Optional<ScoreProgress> optScore = this.game.playerManager().progressManager().scoreProgress();
+	private void checkWinAndEliminated() {
+		this.game.winningTeams();
+		this.game.eliminatedTeams();
 	}
 }

@@ -11,8 +11,7 @@
   ],
   "generator": {
     "template": "the_towers:classic/two_teams",
-    "daylight_cycle": false,
-    "dimension": "minecraft:overworld"
+    "daylight_cycle": false
   },
   "player_config": {
     "min": 1,
@@ -234,7 +233,8 @@
   },
   "objectives": {
     "score": {
-      "base": 10
+      "start_value": 10,
+      "min": 0
     }
   }
 }

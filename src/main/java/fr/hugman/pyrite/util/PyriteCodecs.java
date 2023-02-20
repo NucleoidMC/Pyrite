@@ -25,7 +25,7 @@ public class PyriteCodecs {
 	private static Codec<IntProvider> nonZeroIntProvider() {
 		Function<IntProvider, DataResult<IntProvider>> function = (provider) -> {
 			if (provider.getMin() <= 0 && provider.getMax() >= 0) {
-				return DataResult.error("Value provider should not contain the zero value: [" + provider.getMin() + "-" + provider.getMax() + "]");
+				return DataResult.error("Value provider should not contain the zero startValue: [" + provider.getMin() + "-" + provider.getMax() + "]");
 			}
 			return DataResult.success(provider);
 		};
@@ -35,7 +35,7 @@ public class PyriteCodecs {
 	private static Codec<FloatProvider> nonZeroFloatProvider() {
 		Function<FloatProvider, DataResult<FloatProvider>> function = (provider) -> {
 			if (provider.getMin() <= 0.0F && provider.getMax() >= 0.0F) {
-				return DataResult.error("Value provider should not contain the zero value: [" + provider.getMin() + "-" + provider.getMax() + "]");
+				return DataResult.error("Value provider should not contain the zero startValue: [" + provider.getMin() + "-" + provider.getMax() + "]");
 			}
 			return DataResult.success(provider);
 		};

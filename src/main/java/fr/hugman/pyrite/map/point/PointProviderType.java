@@ -2,8 +2,8 @@ package fr.hugman.pyrite.map.point;
 
 import com.mojang.serialization.Codec;
 import fr.hugman.pyrite.Pyrite;
-import fr.hugman.pyrite.PyriteRegistries;
-import net.minecraft.util.registry.Registry;
+import fr.hugman.pyrite.registry.PyriteRegistries;
+import net.minecraft.registry.Registry;
 
 public record PointProviderType<P extends PointProvider>(Codec<P> codec) {
 	public static final PointProviderType<FixedPointProvider> FIXED = register("fixed", FixedPointProvider.CODEC);

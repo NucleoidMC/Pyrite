@@ -20,7 +20,11 @@ public record Spawn(PointProvider point, Angle angle, Optional<String> kit) {
 	).apply(instance, Spawn::new));
 
 	public Vec3d pos(PyriteGame game, ServerPlayerEntity player) {
-		return this.point.getRandom(game.random(), EventContext.create(game).entity(player).build());
+		return this.pos(game.random(), EventContext.create(game).entity(player).build());
+	}
+
+	public Vec3d pos(Random random, EventContext context) {
+		return this.point.getRandom(random, context);
 	}
 
 	public float yaw(Random random) {

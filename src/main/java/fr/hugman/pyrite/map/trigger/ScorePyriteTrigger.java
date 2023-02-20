@@ -41,7 +41,7 @@ public record ScorePyriteTrigger(GameTeamKey teamKey, IntProvider amount) implem
 			else context.game().sendMessage(Text.literal(this.teamKey + " gained " + i + " points."));
 		}
 		//TODO: actually attribute the point
-		Optional<ScoreProgress> optScore = context.game().playerManager().progressManager().scoreProgress();
+		Optional<ScoreProgress> optScore = context.game().progressManager().scoreProgress();
 		if(optScore.isEmpty()) throw new IllegalStateException("No score objective found");
 		optScore.get().addPoint(this.teamKey, i);
 		context.game().updateWinningStatus(this.teamKey);

@@ -15,7 +15,7 @@ public record PyriteSidebar(PyriteGame game, SidebarWidget widget) {
 	public void update(long gameTick) {
 		widget.set(content -> {
 			content.add(Text.empty());
-			game.playerManager().progressManager().scoreProgress().ifPresent(scoreObjective -> scoreObjective.fillSidebar(this.game, content));
+			game.progressManager().scoreProgress().ifPresent(scoreObjective -> scoreObjective.fillSidebar(this.game, content));
 			content.add(Text.empty());
 			content.add(TickUtil.toText(gameTick));
 		});

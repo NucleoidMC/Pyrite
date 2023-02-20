@@ -4,6 +4,7 @@ import fr.hugman.pyrite.context.EventContext;
 import fr.hugman.pyrite.game.PlayerManager;
 import fr.hugman.pyrite.game.PyriteGame;
 import fr.hugman.pyrite.game.PyriteSidebar;
+import fr.hugman.pyrite.map.objective.progress.ProgressManager;
 import net.minecraft.block.BlockState;
 import net.minecraft.entity.damage.DamageSource;
 import net.minecraft.item.ItemStack;
@@ -33,8 +34,8 @@ import xyz.nucleoid.stimuli.event.player.PlayerDeathEvent;
 public final class PyriteActive {
 	private final PyriteGame game;
 	private final PyriteSidebar sidebar;
-	public long gameTick = 0;
-	public long gameCloseTick = -1L;
+	public long tick = 0;
+	public long closeTick = -1L;
 
 	public PyriteActive(PyriteGame game, PyriteSidebar sidebar) {
 		this.game = game;
@@ -42,14 +43,17 @@ public final class PyriteActive {
 	}
 
 	public static GameResult transferActivity(PyritePreStart preStart) {
-		preStart.game().space().setActivity(activity -> {
-			var playerManager = PlayerManager.create(preStart.game(), TeamManager.addTo(activity), preStart.teamSelection());
-			preStart.game().setPlayerManager(playerManager);
+		preStart.space().setActivity(activity -> {
+			var game = new PyriteGame(preStart.map(), activity.getGameSpace(), preStart.world());
+			var playerManager = PlayerManager.create(game, TeamManager.addTo(activity), preStart.teamSelection());
+			var progressManager = new ProgressManager(game);
+			game.setPlayerManager(playerManager);
+			game.setProgressManager(progressManager);
 
 			var widgets = GlobalWidgets.addTo(activity);
-			var sidebar = PyriteSidebar.create(preStart.game(), widgets);
+			var sidebar = PyriteSidebar.create(game, widgets);
 
-			var active = new PyriteActive(preStart.game(), sidebar);
+			var active = new PyriteActive(game, sidebar);
 
 			activity.allow(GameRuleType.CRAFTING);
 			activity.deny(GameRuleType.PORTALS);
@@ -76,9 +80,12 @@ public final class PyriteActive {
 	}
 
 	private PlayerOfferResult offerPlayer(PlayerOffer offer) {
-		//TODO : team re-joining
+		if(this.game.hasEnded()) {
+
+		}
+		//TODO: team re-joining
 		var player = offer.player();
-		return offer.accept(this.game.world(), this.game.getSpawn(player).pos(this.game, player)).and(() -> {
+		return offer.accept(this.game.world(), this.game.getSpawn(player).pos(this.game.random(), EventContext.create(game).entity(player).build())).and(() -> {
 			player.changeGameMode(GameMode.ADVENTURE);
 			this.game.tpToSpawn(player);
 		});
@@ -134,36 +141,29 @@ public final class PyriteActive {
 		for(var player : this.game.onlinePlayers()) {
 			this.game.respawn(player);
 		}
-		this.game.playerManager().progressManager().scoreProgress().ifPresent(scoreObjective -> this.game.playerManager().teamKeys().forEach(scoreObjective::points));
+		this.game.progressManager().scoreProgress().ifPresent(scoreObjective -> this.game.playerManager().teamKeys().forEach(scoreObjective::points));
 	}
 
 	private void tick() {
-		this.gameTick++;
-		// Check if players are entering or exiting regions
-		for(var player : this.game.onlinePlayers()) {
-			var playerData = this.game.playerManager().playerData(player);
-			var lastPos = playerData.lastTickPos;
-			var currentPos = player.getPos();
-			if(!lastPos.equals(currentPos)) {
-				boolean cannotMove = false;
-				for(var listenerConfig : this.game.map().playerListenerLists().move()) {
-					var result = listenerConfig.test(EventContext.create(this.game).entity(player).build());
-					if(result == ActionResult.FAIL) {
-						cannotMove = true;
-					}
-				}
-				//TODO: implement entering/leaving regions
-				if(cannotMove) player.teleport(this.game.world(), lastPos.getX(), lastPos.getY(), lastPos.getZ(), player.getYaw(), player.getPitch());
-				else playerData.lastTickPos = currentPos;
+		this.tick++;
+
+		// Game is active
+		if(!this.game.hasEnded()) {
+			this.game.tick();
+			if(this.tick % 20 == 0) this.sidebar.update(this.tick);
+		}
+		// Game is inactive
+		else {
+			// Game is ending on this specific tick
+			if(this.closeTick == -1L) {
+				// TODO: scale end duration based on tick
+				long endDuration = 15 * 20L;
+				this.closeTick = this.tick + endDuration;
+			}
+			// The space is closing
+			else if(this.tick == this.closeTick) {
+				this.game.space().close(GameCloseReason.FINISHED);
 			}
 		}
-		//TODO: check win conditions
-		if(this.gameTick % 20 == 0) this.sidebar.update(this.gameTick);
-		if(this.gameTick == this.gameCloseTick) this.game.space().close(GameCloseReason.FINISHED);
-	}
-
-	private void checkWinAndEliminated() {
-		this.game.winningTeams();
-		this.game.eliminatedTeams();
 	}
 }

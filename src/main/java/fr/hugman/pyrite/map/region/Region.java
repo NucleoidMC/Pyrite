@@ -2,7 +2,7 @@ package fr.hugman.pyrite.map.region;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
-import fr.hugman.pyrite.PyriteRegistries;
+import fr.hugman.pyrite.registry.PyriteRegistries;
 import fr.hugman.pyrite.game.PyriteGame;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.Vec3i;

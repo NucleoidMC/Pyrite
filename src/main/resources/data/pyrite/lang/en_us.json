@@ -5,6 +5,9 @@
 	"commands.pyrite.map.info.failed.decode": "Failed to decode map info",
 	"commands.pyrite.map.info.failed.display": "Failed to display map info",
 
+	"text.pyrite.team_won": "%s team has won!",
+	"text.pyrite.team_eliminated": "%s team has been eliminated!",
+
 	"error.pyrite.map.generator.load_template": "Could not generate map template: %s",
 	"error.pyrite.region.random_point_unsupported": "Cannot generate a random point in a region of type '%s'"
 }

@@ -2,7 +2,7 @@ package fr.hugman.pyrite.map.point;
 
 import com.mojang.datafixers.util.Either;
 import com.mojang.serialization.Codec;
-import fr.hugman.pyrite.PyriteRegistries;
+import fr.hugman.pyrite.registry.PyriteRegistries;
 import fr.hugman.pyrite.context.EventContext;
 import fr.hugman.pyrite.util.PyriteCodecs;
 import net.minecraft.util.math.Vec3d;

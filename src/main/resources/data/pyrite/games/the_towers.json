@@ -1,0 +1,14 @@
+{
+  "type": "pyrite:base",
+  "name": {
+    "translate": "game.scorebox"
+  },
+  "maps": [
+    "the_towers:classic/two_teams"
+  ],
+  "players": {
+    "min": 1,
+    "threshold": 8,
+    "max": 16
+  }
+}

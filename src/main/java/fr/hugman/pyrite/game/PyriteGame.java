@@ -1,5 +1,6 @@
 package fr.hugman.pyrite.game;
 
+import fr.hugman.pyrite.context.EventContext;
 import fr.hugman.pyrite.game.phase.PyriteActive;
 import fr.hugman.pyrite.map.PyriteMap;
 import fr.hugman.pyrite.map.objective.progress.ProgressManager;
@@ -10,6 +11,7 @@ import net.minecraft.server.world.ServerWorld;
 import net.minecraft.sound.SoundEvent;
 import net.minecraft.sound.SoundEvents;
 import net.minecraft.text.Text;
+import net.minecraft.util.ActionResult;
 import net.minecraft.util.math.ChunkPos;
 import net.minecraft.util.math.random.Random;
 import net.minecraft.world.GameMode;
@@ -18,18 +20,19 @@ import xyz.nucleoid.plasmid.game.GameSpacePlayers;
 import xyz.nucleoid.plasmid.game.common.team.GameTeamKey;
 import xyz.nucleoid.plasmid.game.player.PlayerSet;
 
-import java.util.List;
-
 public final class PyriteGame {
 	private final PyriteMap map;
 	private final GameSpace space;
 	private final ServerWorld world;
 	private PlayerManager playerManager;
+	private ProgressManager progressManager;
+	private boolean ended;
 
 	public PyriteGame(PyriteMap map, GameSpace space, ServerWorld world) {
 		this.map = map;
 		this.space = space;
 		this.world = world;
+		this.ended = false;
 	}
 
 	public PyriteMap map() {return map;}
@@ -47,6 +50,18 @@ public final class PyriteGame {
 
 	public void setPlayerManager(PlayerManager playerManager) {this.playerManager = playerManager;}
 
+	public ProgressManager progressManager() {
+		return progressManager;
+	}
+
+	public void setProgressManager(ProgressManager progressManager) {
+		this.progressManager = progressManager;
+	}
+
+	public boolean hasEnded() {
+		return ended;
+	}
+
 	public Random random() {return world.getRandom();}
 
 	public GameSpacePlayers onlinePlayers() {return space.getPlayers();}
@@ -55,31 +70,102 @@ public final class PyriteGame {
 		return this.playerManager.teamManager().playersIn(teamKey);
 	}
 
+	public void tick() {
+		// Check if players are entering or exiting regions
+		for(var player : this.onlinePlayers()) {
+			var playerData = this.playerManager().playerData(player);
+			var lastPos = playerData.lastTickPos;
+			var currentPos = player.getPos();
+			if(!lastPos.equals(currentPos)) {
+				boolean cannotMove = false;
+				for(var listenerConfig : this.map().playerListenerLists().move()) {
+					var result = listenerConfig.test(EventContext.create(this).entity(player).build());
+					if(result == ActionResult.FAIL) {
+						cannotMove = true;
+					}
+				}
+				if(cannotMove) player.teleport(this.world(), lastPos.getX(), lastPos.getY(), lastPos.getZ(), player.getYaw(), player.getPitch());
+				else playerData.lastTickPos = currentPos;
+			}
+		}
+	}
+
+	public void end() {
+		this.ended = true;
+
+		for(var player : this.onlinePlayers()) {
+			player.changeGameMode(GameMode.SPECTATOR);
+		}
+	}
+
 	public void updateWinningStatus(GameTeamKey teamKey) {
 		var data = this.playerManager.teamData(teamKey);
+
 		boolean wasEliminated = data.eliminated;
-		if(this.playerManager.progressManager().scoreProgress().isPresent()) {
-			if(this.playerManager.progressManager().scoreProgress().get().isWinning(teamKey)) {
-				data.isWinning = true;
+		boolean hasWon = data.won;
+		boolean won = true;
+		boolean eliminated = false;
+
+		//TODO: special win/elim conditions
+		if(this.progressManager.scoreProgress().isPresent()) {
+			if(!this.progressManager.scoreProgress().get().finished(teamKey)) {
+				won = false;
 			}
-			if(this.playerManager.progressManager().scoreProgress().get().shouldBeEliminated(teamKey)) {
-				data.eliminated = true;
+			if(this.progressManager.scoreProgress().get().failed(teamKey)) {
+				eliminated = true;
 			}
 		}
 
-		if(data.eliminated && !wasEliminated) {
+		if(won && !hasWon) {
+			this.win(teamKey);
+		}
+
+		if(eliminated && !wasEliminated) {
 			this.eliminate(teamKey);
 		}
 	}
 
+	/**
+	 * @return the last team that is not eliminated, or null if there is more than one team not eliminated.
+	 */
+	public GameTeamKey getLastTeam() {
+		var teams = this.playerManager.teamKeys();
+		// if there is only one team not eliminated, it wins
+		var winningTeams = teams.stream().filter(team -> !this.playerManager.teamData(team).eliminated).toList();
+		if(winningTeams.size() == 1) {
+			return winningTeams.get(0);
+		}
+		return null;
+	}
+
+	public void win(GameTeamKey teamKey) {
+		var data = this.playerManager.teamData(teamKey);
+		data.won = true;
+		this.sendMessage(Text.translatable("text.pyrite.team_won", this.playerManager.teamConfig(teamKey).name()));
+
+		//TODO: special win amounts
+		//TODO: leaderboards? (2nd team, 3rd team, etc.)
+		this.end();
+	}
+
 	public void eliminate(GameTeamKey teamKey) {
-		// TODO: put team members in spectator
+		var data = this.playerManager.teamData(teamKey);
+		data.eliminated = true;
+
 		this.onlinePlayers(teamKey).forEach(player -> player.changeGameMode(GameMode.SPECTATOR));
 
-		Text msg = Text.translatable("text.the_towers.team_eliminated", this.playerManager.teamConfig(teamKey).name());
+		var lastTeam = this.getLastTeam();
+		if(lastTeam != null) {
+			// display win
+			this.win(lastTeam);
+		}
+		else {
+			// display elimination
+			Text msg = Text.translatable("text.pyrite.team_eliminated", this.playerManager.teamConfig(teamKey).name());
+			this.sendMessage(Text.literal("\n").append(msg).append("\n"));
+			this.playSound(SoundEvents.ENTITY_FIREWORK_ROCKET_BLAST);
+		}
 
-		this.sendMessage(Text.literal("\n").append(msg).append("\n"));
-		this.playSound(SoundEvents.ENTITY_FIREWORK_ROCKET_BLAST);
 	}
 
 	public void playSound(SoundEvent sound) {this.onlinePlayers().playSound(sound);}

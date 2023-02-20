@@ -2,7 +2,7 @@
   "required": true,
   "package": "fr.hugman.pyrite.mixin",
   "compatibilityLevel": "JAVA_17",
-  "mixins": ["DynamicRegistryManagerMixin"],
+  "mixins": [],
   "injectors": {
     "defaultRequire": 1
   }

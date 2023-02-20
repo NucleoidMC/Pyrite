@@ -3,9 +3,9 @@ package fr.hugman.pyrite;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import fr.hugman.pyrite.map.PyriteMap;
+import fr.hugman.pyrite.registry.PyriteRegistries;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.random.Random;
-import net.minecraft.util.registry.DynamicRegistryManager;
 
 import java.util.List;
 
@@ -23,9 +23,9 @@ public record PyriteConfig(List<Identifier> maps) {
 			Identifier.CODEC.listOf().fieldOf("maps").forGetter(PyriteConfig::maps)
 	).apply(instance, PyriteConfig::new));
 
-	public PyriteMap randomMap(DynamicRegistryManager registryManager, Random random) {
+	public PyriteMap randomMap(Random random) {
 		var maps = this.maps();
-		var mapId = maps.get((int) Math.nextDown(maps.size()));
-		return registryManager.get(PyriteRegistries.MAP.getKey()).get(mapId);
+		var mapId = maps.get(random.nextInt(maps.size()));
+		return PyriteRegistries.MAP.get(mapId);
 	}
 }

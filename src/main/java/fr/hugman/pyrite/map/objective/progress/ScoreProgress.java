@@ -6,11 +6,8 @@ import fr.hugman.pyrite.map.objective.ScoreObjective;
 import net.minecraft.text.Text;
 import xyz.nucleoid.plasmid.game.common.team.GameTeamKey;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 public class ScoreProgress {
 	private final ScoreObjective objective;
@@ -21,19 +18,19 @@ public class ScoreProgress {
 	}
 
 	public int points(GameTeamKey key) {
-		return this.points.computeIfAbsent(key, teamKey -> this.objective.base());
+		return this.points.computeIfAbsent(key, teamKey -> this.objective.startValue());
 	}
 
 	public void addPoint(GameTeamKey key, int amount) {
 		this.points.compute(key, (teamKey, current) -> current + amount);
 	}
 
-	public boolean isWinning(GameTeamKey teamKey) {
-		return this.points.get(teamKey) >= this.objective.max().orElse(this.objective.base());
+	public boolean finished(GameTeamKey teamKey) {
+		return this.points.get(teamKey) >= this.objective.max();
 	}
 
-	public boolean shouldBeEliminated(GameTeamKey teamKey) {
-		return this.points.get(teamKey) <= this.objective.max().map(integer -> 0).orElse(1);
+	public boolean failed(GameTeamKey teamKey) {
+		return this.points.get(teamKey) <= this.objective.min();
 	}
 
 	public GameTeamKey getTeamKey(int i) {
@@ -67,7 +64,7 @@ public class ScoreProgress {
 
 		// then display the other teams
 		if(this.points.keySet().size() > 1) {
-			for(int i = 0 ; i < this.points.keySet().size() - 1; i++) {
+			for(int i = 0; i < this.points.keySet().size() - 1; i++) {
 				int finalI = i;
 				builder.add(player -> {
 					var teamKey = game.playerManager().teamKey(player);

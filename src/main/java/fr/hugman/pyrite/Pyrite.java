@@ -2,6 +2,7 @@ package fr.hugman.pyrite;
 
 import fr.hugman.pyrite.command.PyriteCommand;
 import fr.hugman.pyrite.game.phase.PyritePreStart;
+import fr.hugman.pyrite.registry.PyriteRegistries;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.command.v2.CommandRegistrationCallback;
 import net.minecraft.util.Identifier;
@@ -19,7 +20,7 @@ public class Pyrite implements ModInitializer {
 
 	@Override
 	public void onInitialize() {
-		PyriteRegistries.onInitialize();
+		PyriteRegistries.register();
 		CommandRegistrationCallback.EVENT.register((dispatcher, registryAccess, environment) -> PyriteCommand.register(dispatcher));
 		GameType.register(Pyrite.id("base"), PyriteConfig.CODEC, PyritePreStart::open);
 	}

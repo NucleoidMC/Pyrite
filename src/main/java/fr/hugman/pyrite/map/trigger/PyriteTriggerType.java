@@ -2,8 +2,8 @@ package fr.hugman.pyrite.map.trigger;
 
 import com.mojang.serialization.Codec;
 import fr.hugman.pyrite.Pyrite;
-import fr.hugman.pyrite.PyriteRegistries;
-import net.minecraft.util.registry.Registry;
+import fr.hugman.pyrite.registry.PyriteRegistries;
+import net.minecraft.registry.Registry;
 
 public record PyriteTriggerType<P extends PyriteTrigger>(Codec<P> codec) {
 	public static final PyriteTriggerType<CancelPyriteTrigger> CANCEL = register("cancel", CancelPyriteTrigger.CODEC);

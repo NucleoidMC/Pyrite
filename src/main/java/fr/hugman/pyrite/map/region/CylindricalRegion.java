@@ -9,7 +9,7 @@ import net.minecraft.util.math.random.Random;
 
 public record CylindricalRegion(Vec3d base, double radius, double top) implements Region {
 	public static final Codec<CylindricalRegion> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-			PyriteCodecs.VEC_3D.fieldOf("base").forGetter(CylindricalRegion::base),
+			PyriteCodecs.VEC_3D.fieldOf("limit").forGetter(CylindricalRegion::base),
 			Codec.DOUBLE.fieldOf("radius").forGetter(CylindricalRegion::radius),
 			Codec.DOUBLE.fieldOf("top").forGetter(CylindricalRegion::top)
 	).apply(instance, CylindricalRegion::new));
@@ -37,7 +37,7 @@ public record CylindricalRegion(Vec3d base, double radius, double top) implement
 
 		double d = this.base().getX() - pos.x;
 		double f = this.base().getZ() - pos.z;
-		return !(d * d + f * f > radius * radius); // point is outside the base circle
+		return !(d * d + f * f > radius * radius); // point is outside the limit circle
 	}
 
 	@Override

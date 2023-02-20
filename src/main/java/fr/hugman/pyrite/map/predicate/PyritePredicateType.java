@@ -2,8 +2,8 @@ package fr.hugman.pyrite.map.predicate;
 
 import com.mojang.serialization.Codec;
 import fr.hugman.pyrite.Pyrite;
-import fr.hugman.pyrite.PyriteRegistries;
-import net.minecraft.util.registry.Registry;
+import fr.hugman.pyrite.registry.PyriteRegistries;
+import net.minecraft.registry.Registry;
 
 public record PyritePredicateType<P extends PyritePredicate>(Codec<P> codec) {
 	public static final PyritePredicateType<ReferencePyritePredicate> REFERENCE = register("reference", ReferencePyritePredicate.CODEC);
